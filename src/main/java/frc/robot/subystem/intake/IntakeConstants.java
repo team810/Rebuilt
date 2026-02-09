@@ -1,9 +1,8 @@
 package frc.robot.subystem.intake;
 
-import com.ctre.phoenix6.CANBus;
-
 public class IntakeConstants {
-    public static final CANBus CANBUS =  new CANBus();
-    public static final int INTAKE_MOTOR_ID = 0;
-    public static final int ROTATE_INTAKE_MOTOR_ID = 1;
+    public static final int PIVOT_ID = 14;
+    public static final int SPIN_ID = 12;
+
+    public static final double INTAKE_MAX_SPEED = 0.75;
 }
