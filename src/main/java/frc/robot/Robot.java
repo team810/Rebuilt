@@ -5,6 +5,13 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Tracer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subystem.mop.Mop;
+import frc.robot.subystem.mop.MopStates;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -12,11 +19,25 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 
 public class Robot extends LoggedRobot {
+    Mop mop;
+    XboxController xboxController;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  public Robot() {}
+  public Robot(){
+      mop = new Mop();
+      xboxController = new XboxController(0);
+      CommandScheduler.getInstance().setPeriod(0.015);
+      Trigger mopMove =  new Trigger(()-> xboxController.getAButton());
+      mopMove.whileTrue(
+              new StartEndCommand(
+                      ()->mop.setMopStates(MopStates.fwd),
+                      ()->mop.setMopStates(MopStates.off),
+                      this.mop
+              )
+      );
+  }
 
   @Override
   public void robotInit() {
