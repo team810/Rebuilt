@@ -1,4 +1,4 @@
-package frc.robot.subystem.shooter;
+package frc.robot.subsystem.shooter;
 
 import com.ctre.phoenix6.CANBus;
 

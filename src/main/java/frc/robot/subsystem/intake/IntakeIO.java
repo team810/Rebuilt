@@ -1,4 +1,4 @@
-package frc.robot.subystem.intake;
+package frc.robot.subsystem.intake;
 
 public interface IntakeIO {
 

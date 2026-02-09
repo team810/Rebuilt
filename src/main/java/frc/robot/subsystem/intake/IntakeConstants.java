@@ -1,4 +1,4 @@
-package frc.robot.subystem.intake;
+package frc.robot.subsystem.intake;
 
 public class IntakeConstants {
     public static final int PIVOT_ID = 14;

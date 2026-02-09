@@ -1,4 +1,4 @@
-package frc.robot.subystem.mop;
+package frc.robot.subsystem.mop;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;

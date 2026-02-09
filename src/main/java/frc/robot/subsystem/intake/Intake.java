@@ -1,4 +1,4 @@
-package frc.robot.subystem.intake;
+package frc.robot.subsystem.intake;
 
 //import au.grapplerobotics.LaserCan;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
