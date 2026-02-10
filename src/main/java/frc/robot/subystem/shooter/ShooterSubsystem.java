@@ -1,25 +1,28 @@
 package frc.robot.subystem.shooter;
 
 
-import frc.robot.Robot;
+import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.Logger;
 
-public class ShooterSubsystem extends Shooter {
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.RPM;
+
+public class ShooterSubsystem extends ShooterTalonFX {
     private static ShooterSubsystem INSTANCE;
 
     private final ShooterIO shooter;
 
-    private double leaderTargetSpeed;
-    private double followerTargetSpeed;
+    private AngularVelocity leaderTargetSpeed;
+    private AngularVelocity followerTargetSpeed;
 
     private ShooterMode shooterMode;
 
-    private double targetTopTestRPM;
-    private double targetBottomTestRPM;
+//    private double targetTopTestRPM;
+//    private double targetBottomTestRPM;
 
     private ShooterSubsystem()
     {
-        shooter = new Shooter();
+        shooter = new ShooterTalonFX();
 
 //        if (Robot.isReal())
 //        {
@@ -28,13 +31,13 @@ public class ShooterSubsystem extends Shooter {
 //            shooter = new ShooterSim();
 //        }
 
-        leaderTargetSpeed = 0;
-        followerTargetSpeed = 0;
+//        leaderTargetSpeed = 0;
+//        followerTargetSpeed = 0;
 
         shooterMode = ShooterMode.off;
 
-        targetTopTestRPM = 2000;
-        targetBottomTestRPM = 2000;
+//        targetTopTestRPM = 2000;
+//        targetBottomTestRPM = 2000;
     }
 
     @Override
@@ -57,18 +60,16 @@ public class ShooterSubsystem extends Shooter {
         switch (shooterMode)
         {
             case on -> {
-                leaderTargetSpeed = 2000;
-                followerTargetSpeed = 2000;
+                leaderTargetSpeed = calculateLeaderRPM(Inches.of(6));
+                followerTargetSpeed = leaderTargetSpeed;
             }
 
             case off -> {
-                leaderTargetSpeed = 0;
-                followerTargetSpeed = 0;
+                leaderTargetSpeed = AngularVelocity.ofBaseUnits(0, RPM.getBaseUnit());
+                followerTargetSpeed = AngularVelocity.ofBaseUnits(0,RPM.getBaseUnit());
             }
         }
-
-        shooter.setLeaderTargetRPM(leaderTargetSpeed);
-        shooter.setFollowerTargetRPM(followerTargetSpeed);
+        //shooter.LeaderTargetRPM(shooterMode);
     }
 
 

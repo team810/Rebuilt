@@ -1,10 +1,10 @@
-package frc.robot.subystem.shooter;
+package frc.robot.subystem.feeder;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 
-public interface ShooterIO {
-    public AngularVelocity calculateLeaderRPM(Distance distance);
+public interface FeederIO {
+    public AngularVelocity calculateFeederRPM(Distance distance);
 
     public void readPeriodic();
     public void writePeriodic();
