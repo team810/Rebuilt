@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import org.littletonrobotics.junction.Logger;
 
-public abstract class MopTalonFX implements Subsystem, MopIO {
+public class MopTalonFX implements Subsystem, MopIO {
     private final TalonFX mopMotor;
     private double inputVoltage;
     private final StatusSignal<AngularVelocity> velocitySignal;
@@ -76,6 +76,4 @@ public abstract class MopTalonFX implements Subsystem, MopIO {
     public void simulationPeriodic() {
         Subsystem.super.simulationPeriodic();
     }
-
-    public abstract void simulatePeriodic();
 }
