@@ -17,16 +17,14 @@ import org.littletonrobotics.junction.LoggedRobot;
 
 
 public class Robot extends LoggedRobot {
-    Mop mop;
+    MopTalonFX mop;
     XboxController xboxController;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot(){
-      mop = new Mop() {
-           public void simulatePeriodic() {}
-      };
+      mop = new MopTalonFX();
       xboxController = new XboxController(0);
       CommandScheduler.getInstance().setPeriod(0.015);
       Trigger mopMove =  new Trigger(()-> xboxController.getAButton());
