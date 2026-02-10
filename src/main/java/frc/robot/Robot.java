@@ -7,9 +7,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystem.mop.Mop;
 import frc.robot.subsystem.mop.MopStates;
+import frc.robot.subsystem.mop.MopSubsystem;
+import frc.robot.subsystem.mop.MopTalonFX;
 import org.littletonrobotics.junction.LoggedRobot;
 
 
@@ -21,7 +24,9 @@ public class Robot extends LoggedRobot {
    * initialization code.
    */
   public Robot(){
-      mop = new Mop();
+      mop = new Mop() {
+           public void simulatePeriodic() {}
+      };
       xboxController = new XboxController(0);
       CommandScheduler.getInstance().setPeriod(0.015);
       Trigger mopMove =  new Trigger(()-> xboxController.getAButton());
@@ -29,7 +34,7 @@ public class Robot extends LoggedRobot {
               new StartEndCommand(
                       ()->mop.setMopStates(MopStates.fwd),
                       ()->mop.setMopStates(MopStates.off),
-                      this.mop
+                      (Subsystem) this.mop
               )
       );
   }
@@ -71,5 +76,7 @@ public class Robot extends LoggedRobot {
   public void simulationInit() {}
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+      MopSubsystem.getInstance().simulationPeriodic();
+  }
 }
