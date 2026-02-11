@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 
 public class Robot extends LoggedRobot {
@@ -15,7 +19,13 @@ public class Robot extends LoggedRobot {
   public Robot() {}
 
   @Override
+  public void robotInit() {
+  }
+
+  @Override
   public void robotPeriodic() {}
+
+
 
   @Override
   public void autonomousInit() {}
