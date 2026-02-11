@@ -1,7 +1,6 @@
-package frc.robot.subystem.shooter;
+package frc.robot.subsystem.shooter;
 
 
-import frc.robot.Robot;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends Shooter {
