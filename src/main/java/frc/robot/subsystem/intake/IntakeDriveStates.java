@@ -1,6 +1,6 @@
 package frc.robot.subsystem.intake;
 
-public enum IntakeStates {
+public enum IntakeDriveStates {
     fwd,
     rev,
     off,
