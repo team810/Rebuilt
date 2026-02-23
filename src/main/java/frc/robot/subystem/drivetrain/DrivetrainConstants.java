@@ -1,6 +1,10 @@
 package frc.robot.subystem.drivetrain;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class DrivetrainConstants {
     public final static CANBus DRIVETRAIN_CANBUS = new CANBus("Drivetrain");
@@ -61,5 +65,64 @@ public class DrivetrainConstants {
             }
         }
         return 0;
+    }
+
+
+    public static TalonFXConfiguration getDriveConfig() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+        config.CurrentLimits.SupplyCurrentLimit = 40;
+        config.CurrentLimits.StatorCurrentLimit = 80;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+
+        config.Voltage.PeakForwardVoltage = 12;
+        config.Voltage.PeakReverseVoltage = -12;
+
+        config.Slot0.kV = .1241;
+        config.Slot0.kG = 0;
+        config.Slot0.kS = 0;
+        config.Slot0.kP = 0;
+        config.Slot0.kI = 0;
+        config.Slot0.kD = 0;
+
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+
+        config.Audio.BeepOnConfig = true;
+        config.Audio.BeepOnBoot = true;
+
+        return config;
+    }
+
+    public static TalonFXConfiguration getSteerConfig() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+        config.CurrentLimits.SupplyCurrentLimit = 20;
+        config.CurrentLimits.StatorCurrentLimit = 40;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+        config.Voltage.PeakForwardVoltage = 12;
+        config.Voltage.PeakReverseVoltage = -12;
+
+        config.Slot0.kV = .1241;
+        config.Slot0.kG = 0;
+        config.Slot0.kS = 0;
+        config.Slot0.kP = 1.9;
+        config.Slot0.kI = 0;
+        config.Slot0.kD = 0;
+
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+
+        config.Audio.BeepOnConfig = true;
+        config.Audio.BeepOnBoot = true;
+
+        return config;
     }
 }
