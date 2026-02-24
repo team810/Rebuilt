@@ -1,25 +1,25 @@
 package frc.robot.subystem.shooter;
 
 
-import frc.robot.Robot;
+import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.Logger;
 
-public class ShooterSubsystem extends Shooter {
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.RPM;
+
+public class ShooterSubsystem extends ShooterTalonFX {
     private static ShooterSubsystem INSTANCE;
 
     private final ShooterIO shooter;
 
-    private double leaderTargetSpeed;
-    private double followerTargetSpeed;
+    private AngularVelocity leaderTargetRPM;
+    private AngularVelocity followerTargetRPM;
 
-    private ShooterMode shooterMode;
-
-    private double targetTopTestRPM;
-    private double targetBottomTestRPM;
+    private ShooterStates shooterState;
 
     private ShooterSubsystem()
     {
-        shooter = new Shooter();
+        shooter = new ShooterTalonFX();
 
 //        if (Robot.isReal())
 //        {
@@ -28,13 +28,10 @@ public class ShooterSubsystem extends Shooter {
 //            shooter = new ShooterSim();
 //        }
 
-        leaderTargetSpeed = 0;
-        followerTargetSpeed = 0;
+//        leaderTargetRPM = 0;
+//        followerTargetRPM = 0;
 
-        shooterMode = ShooterMode.off;
-
-        targetTopTestRPM = 2000;
-        targetBottomTestRPM = 2000;
+        shooterState = ShooterStates.OFF;
     }
 
     @Override
@@ -44,31 +41,30 @@ public class ShooterSubsystem extends Shooter {
 
     @Override
     public void writePeriodic() {
-        Logger.recordOutput("Shooter/Leader/TargetSpeedSub", leaderTargetSpeed);
-        Logger.recordOutput("Shooter/Follower/TargetSpeedSub", followerTargetSpeed);
-        Logger.recordOutput("Shooter/Mode/ShooterMode", shooterMode);
+        Logger.recordOutput("Shooter/Leader/TargetSpeedSub", leaderTargetRPM);
+        Logger.recordOutput("Shooter/Follower/TargetSpeedSub", followerTargetRPM);
+        Logger.recordOutput("Shooter/Mode/ShooterMode", shooterState);
 
         shooter.writePeriodic();
     }
 
-    public void setShooterMode(ShooterMode shooterMode) {
-        this.shooterMode = shooterMode;
+    public void setShooterMode(ShooterStates shooterState) {
+        this.shooterState = shooterState;
 
-        switch (shooterMode)
+        switch (shooterState)
         {
-            case on -> {
-                leaderTargetSpeed = 2000;
-                followerTargetSpeed = 2000;
+            case ON -> {
+                leaderTargetRPM = calculateLeaderRPM(Inches.of(6/*odometry distance double */));
+                followerTargetRPM = leaderTargetRPM;
             }
 
-            case off -> {
-                leaderTargetSpeed = 0;
-                followerTargetSpeed = 0;
+            case OFF -> {
+                leaderTargetRPM = AngularVelocity.ofBaseUnits(0, RPM.getBaseUnit());
+                followerTargetRPM = AngularVelocity.ofBaseUnits(0,RPM.getBaseUnit());
             }
         }
-
-        shooter.setLeaderTargetRPM(leaderTargetSpeed);
-        shooter.setFollowerTargetRPM(followerTargetSpeed);
+        shooter.setLeaderRPM(leaderTargetRPM);
+        shooter.setFollowerRPM(followerTargetRPM);
     }
 
 

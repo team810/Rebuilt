@@ -14,10 +14,10 @@ public class Robot extends LoggedRobot {
 
     public Robot() {}
 
-    @Override
-    public void robotInit() {
+  @Override
+  public void robotPeriodic() {
 
-    }
+  }
 
     @Override
     public void robotPeriodic() {}
