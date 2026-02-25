@@ -33,7 +33,7 @@ public class IntakeSubsystem {
         pistonMap.put(IntakeStates.Deployed, DoubleSolenoid.Value.kForward);
         pistonMap.put(IntakeStates.DeployedRevs, DoubleSolenoid.Value.kForward);
 
-        io = new IntakeTalonFx();
+        io = new IntakeTalonFX();
 
         io.setVoltage(Voltage.ofBaseUnits(0, Units.Volts));
     }
