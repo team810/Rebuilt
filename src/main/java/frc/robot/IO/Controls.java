@@ -6,6 +6,7 @@ public enum Controls {
     verticalVelocity,
     omega,
 
-    resetGyro
+    resetGyro,
+
 
 }

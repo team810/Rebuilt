@@ -30,8 +30,11 @@ public class IntakeTalonFx implements IntakeIO {
     private final DoubleSolenoid solenoid;
 
     public IntakeTalonFx() {
-
-        driveMotor = new TalonFX(IntakeConstants.DRIVE_MOTOR_ID, Robot.MECH_CANBUS);
+        if (Robot.isReal()){
+            driveMotor = new TalonFX(IntakeConstants.DRIVE_MOTOR_ID, Robot.MECH_CANBUS);
+        }else{
+            driveMotor = new TalonFX(16, Robot.MECH_CANBUS);
+        }
 
         TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
         driveMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

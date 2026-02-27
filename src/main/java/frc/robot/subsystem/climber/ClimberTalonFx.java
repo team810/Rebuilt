@@ -30,7 +30,12 @@ public class ClimberTalonFx implements ClimberIO{
 
     public ClimberTalonFx() {
 
-        motor = new TalonFX(ClimberConstants.MOTOR_ID, Robot.MECH_CANBUS);
+        if (Robot.isReal()) {
+
+            motor = new TalonFX(ClimberConstants.MOTOR_ID, Robot.MECH_CANBUS);
+        }else{
+            motor = new TalonFX(14, Robot.MECH_CANBUS);
+        }
 
         TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
         driveMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

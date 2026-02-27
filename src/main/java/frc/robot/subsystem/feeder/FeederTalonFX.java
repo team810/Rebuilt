@@ -25,7 +25,11 @@ public class FeederTalonFX implements FeederIO{
 
 
     public FeederTalonFX() {
-        feederMotor = new TalonFX(FeederConstants.FEEDER_MOTOR_ID, Robot.MECH_CANBUS);
+        if (Robot.isReal()){
+            feederMotor = new TalonFX(FeederConstants.FEEDER_MOTOR_ID, Robot.MECH_CANBUS);
+        }else{
+            feederMotor = new TalonFX(15, Robot.MECH_CANBUS);
+        }
 
         TalonFXConfiguration feederConfig = new TalonFXConfiguration();
         feederConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

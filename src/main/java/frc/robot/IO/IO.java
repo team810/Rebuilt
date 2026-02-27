@@ -25,7 +25,7 @@ public class IO {
         return controlsAnalog.get(controls);
      }
 
-     public static BooleanSupplier getJoystickDigital(Controls controls) {
+     public static BooleanSupplier getButton(Controls controls) {
         return controlsDigital.get(controls);
      }
 }

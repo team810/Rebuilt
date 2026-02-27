@@ -26,8 +26,8 @@ public class DrivetrainConstants {
     public final static double LINEAR_KI = 0;
     public final static double LINEAR_KD = 0;
 
-    public final static double MAX_VELOCITY = 5.6;
-    public final static double MAX_ANGULAR_VELOCITY = 5.6;
+    public final static double MAX_VELOCITY = 5.2;
+    public final static double MAX_ANGULAR_VELOCITY = 5.2;
 
     public final static double BREAK_YAW_LOCK = 1;
 
@@ -132,7 +132,7 @@ public class DrivetrainConstants {
         return config;
     }
 
-    public static TalonFXConfiguration getSteerConfig() {
+    public static TalonFXConfiguration getSteerConfig(SwerveModule module) {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -146,14 +146,16 @@ public class DrivetrainConstants {
         config.Voltage.PeakForwardVoltage = 12;
         config.Voltage.PeakReverseVoltage = -12;
 
-        config.Slot0.kV = .1241;
+        config.Slot0.kV = 0;
         config.Slot0.kG = 0;
         config.Slot0.kS = 0;
-        config.Slot0.kP = 1.9;
+        config.Slot0.kP = 1.9 * (150/7);
         config.Slot0.kI = 0;
         config.Slot0.kD = 0;
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        config.Feedback.FeedbackRemoteSensorID = getEncoderID(module);
+        config.Feedback.RotorToSensorRatio = 150/7;
 
         config.Audio.BeepOnConfig = true;
         config.Audio.BeepOnBoot = true;

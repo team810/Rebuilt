@@ -38,8 +38,14 @@ public class ShooterTalonFX implements ShooterIO {
     private AngularVelocity targetVelocity;
 
     public ShooterTalonFX() {
-        leaderMotor = new TalonFX(ShooterConstants.LEADER_MOTOR_ID, Robot.MECH_CANBUS);
-        followerMotor = new TalonFX(ShooterConstants.FOLLOWER_MOTOR_ID, Robot.MECH_CANBUS);
+        if (Robot.isReal()) {
+            leaderMotor = new TalonFX(ShooterConstants.LEADER_MOTOR_ID, Robot.MECH_CANBUS);
+            followerMotor = new TalonFX(ShooterConstants.FOLLOWER_MOTOR_ID, Robot.MECH_CANBUS);
+        }else{
+            leaderMotor = new TalonFX(18, Robot.MECH_CANBUS);
+            followerMotor = new TalonFX(19, Robot.MECH_CANBUS);
+        }
+
         followerControl = new Follower(ShooterConstants.LEADER_MOTOR_ID, MotorAlignmentValue.Opposed);
 
         config = new TalonFXConfiguration();

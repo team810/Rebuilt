@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.Logger;
 import static edu.wpi.first.units.Units.*;
 
 public class ShooterSubsystem extends ShooterTalonFX {
-    private static ShooterSubsystem INSTANCE;
+    private static ShooterSubsystem INSTANCE = new ShooterSubsystem();
 
     private Distance distanceToTarget;
     private AngularVelocity targetVelocity;
@@ -32,6 +32,7 @@ public class ShooterSubsystem extends ShooterTalonFX {
         stateChooser.addOption("AUTO", ShooterState.AUTO);
         stateChooser.addOption("TEST", ShooterState.TEST);
         stateChooser.onChange(this::setState);
+        setState(ShooterState.OFF);
 
         SmartDashboard.putNumber("Test RPM", testVelocity.in(RotationsPerSecond) * 60);
 

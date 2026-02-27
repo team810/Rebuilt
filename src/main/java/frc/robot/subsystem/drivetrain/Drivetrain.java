@@ -133,6 +133,11 @@ public class Drivetrain {
         backLeft.setTargetState(states[2]);
         backRight.setTargetState(states[3]);
 
+        frontLeft.writePeriodic();
+        frontRight.writePeriodic();
+        backLeft.writePeriodic();
+        backRight.writePeriodic();
+
         Logger.recordOutput("Drivetrain/TargetStates",states);
     }
 
@@ -147,6 +152,10 @@ public class Drivetrain {
 
     public AngularVelocity getRate() {
         return omegaSingal.getValue();
+    }
+
+    public DrivetrainControlIO getControl() {
+        return control;
     }
 
     public Pose2d getPose() {

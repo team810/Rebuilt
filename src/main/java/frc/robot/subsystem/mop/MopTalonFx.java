@@ -25,7 +25,12 @@ public class MopTalonFx implements MopIO {
     private final StatusSignal<Current> mopSupplyCurrentSignal;
 
     public MopTalonFx() {
-        mopMotor = new TalonFX(MopConstants.MOP_MOTOR_ID, Robot.MECH_CANBUS);
+
+        if (Robot.isReal()) {
+            mopMotor = new TalonFX(MopConstants.MOP_MOTOR_ID, Robot.MECH_CANBUS);
+        }else{
+            mopMotor = new TalonFX(17, Robot.MECH_CANBUS);
+        }
 
         TalonFXConfiguration mopConfig = new TalonFXConfiguration();
         mopConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

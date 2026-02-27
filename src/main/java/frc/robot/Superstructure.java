@@ -51,6 +51,10 @@ public class Superstructure {
     private Rotation2d lockAngle;
     private boolean lockFirstTick;
 
+    public void setRobotState(RobotStates robotState) {
+        this.robotState = robotState;
+    }
+
     private enum ShooterTargetLockMode{
         AutoAlign,
         None
@@ -60,6 +64,7 @@ public class Superstructure {
     private ShooterTargetLockMode targetLockOn;
 
     public Superstructure(){
+        setRobotState(RobotStates.Default);
         ChoreoAllianceFlipUtil.setYear(2026);
         setAlliance(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue));
 
@@ -143,6 +148,13 @@ public class Superstructure {
                     );
                 }else{
                     manualDrive(robotPose, horizontalVelocity, verticalVelocity, omegaVelocity);
+                }
+                if (Drivetrain.getInstance().getControl().atSetpoint()) {
+                    FeederSubsystem.getInstance().setState(FeederStates.FEED);
+                    MopSubsystem.getInstance().setState(MopStates.FEED);
+                }else{
+                    MopSubsystem.getInstance().setState(MopStates.OFF);
+                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
                 }
             }
             case Intake -> {
