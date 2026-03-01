@@ -2,6 +2,7 @@ package frc.robot.subsystem.drivetrain;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -36,6 +37,7 @@ public class TalonFxSwerveModule implements SwerveModuleIO {
     private final StatusSignal<Current> driveAppliedCurrentSignal;
 
     private final TalonFX steerMotor;
+    private final DCMotorSim steerMotorSim;
     private final TalonFXSimState steerMotorSimState;
     private final PositionVoltage steerControl;
 
@@ -75,6 +77,8 @@ public class TalonFxSwerveModule implements SwerveModuleIO {
         steerMotorSimState.setSupplyVoltage(12);
         steerMotorSimState.setMotorType(TalonFXSimState.MotorType.KrakenX60);
 
+        steerMotorSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60Foc(1),.000000000001,1),DCMotor.getKrakenX60Foc(1));
+
         steerEncoder = new CANcoder(DrivetrainConstants.getEncoderID(id), DrivetrainConstants.DRIVETRAIN_CANBUS);
         steerEncoderSim = steerEncoder.getSimState();
 
@@ -99,7 +103,6 @@ public class TalonFxSwerveModule implements SwerveModuleIO {
         driveAppliedCurrentSignal = driveMotor.getStatorCurrent();
 
         steerControl = new PositionVoltage(0);
-        steerControl.EnableFOC = true;
         steerControl.Slot = 0;
         steerControl.UseTimesync = true;
         steerControl.UpdateFreqHz = 1000;
@@ -116,6 +119,7 @@ public class TalonFxSwerveModule implements SwerveModuleIO {
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
         encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = .5;
         encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        steerEncoder.getConfigurator().apply(encoderConfig);
 
         targetState = new SwerveModuleState();
         currentState = new SwerveModuleState();
@@ -132,7 +136,7 @@ public class TalonFxSwerveModule implements SwerveModuleIO {
         );
 
         StatusSignal.setUpdateFrequencyForAll(
-            5,
+            250,
             driveMotorTempSignal,
             driveAppliedVoltageSignal,
             driveSupplyCurrentSignal,
@@ -242,15 +246,17 @@ public class TalonFxSwerveModule implements SwerveModuleIO {
         driveMotorSimState.setRotorAcceleration(driveMotorSim.getAngularAcceleration());
 
         // Voltage -> Angular Velocity of the wheel
-        AngularVelocity simOmega = AngularVelocity.ofBaseUnits(
-            ((steerAppliedVoltageSignal.getValue().in(Units.Volts) / 12) * (5800 / 60)) / ((150/7)),
-            Units.RotationsPerSecond
-        );
+
+        steerMotorSim.setInputVoltage(steerAppliedVoltageSignal.getValue().in(Units.Volt));
+        steerMotorSim.update(Robot.PERIOD);
+
         steerEncoderSim.setSupplyVoltage(12);
-        steerEncoderSim.setVelocity(simOmega);
-        steerEncoderSim.addPosition(simOmega.in(Units.RotationsPerSecond) * Robot.PERIOD);
+        steerEncoderSim.setVelocity(steerMotorSim.getAngularVelocity().in(Units.RotationsPerSecond) / (150/7));
+        steerEncoderSim.setRawPosition(steerMotorSim.getAngularPosition().in(Units.Rotations) / (150/7));
 
         steerMotorSimState.setSupplyVoltage(12);
+        steerMotorSimState.setRawRotorPosition(steerMotorSim.getAngularPosition());
+        steerMotorSimState.setRotorVelocity(steerMotorSim.getAngularVelocity());
     }
 
     @Override

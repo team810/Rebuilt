@@ -19,6 +19,18 @@ public class IO {
         controlsAnalog.put(Controls.omega, () -> primary.getRightX());
 
         controlsDigital.put(Controls.resetGyro, () -> primary.getAButton());
+
+        controlsDigital.put(Controls.intake, () -> primary.getAButton());
+        controlsDigital.put(Controls.reverseIntake, () -> primary.getYButton());
+        controlsDigital.put(Controls.climbAlign, () -> primary.getLeftBumperButton() ||  primary.getRightBumperButton());
+        controlsDigital.put(Controls.alignShooting, () -> primary.getLeftTriggerAxis() > -.7);
+        controlsDigital.put(Controls.shooting, () -> primary.getRightTriggerAxis() > -.7);
+
+        controlsDigital.put(Controls.manualClimbUp, () -> primary.getPOV() == 0);
+        controlsDigital.put(Controls.manualClimbDown, () -> primary.getPOV() == 180);
+        controlsDigital.put(Controls.extendClimb, () -> primary.getPOV() == 270);
+        controlsDigital.put(Controls.retractClimb, () -> primary.getPOV() == 90);
+
     }
 
      public static DoubleSupplier getJoystick(Controls controls) {

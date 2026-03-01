@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Robot;
 
 public class DrivetrainConstants {
     public final static CANBus DRIVETRAIN_CANBUS = new CANBus("Drivetrain");
@@ -27,7 +28,7 @@ public class DrivetrainConstants {
     public final static double LINEAR_KD = 0;
 
     public final static double MAX_VELOCITY = 5.2;
-    public final static double MAX_ANGULAR_VELOCITY = 5.2;
+    public final static double MAX_ANGULAR_VELOCITY = 9.6;
 
     public final static double BREAK_YAW_LOCK = 1;
 
@@ -143,19 +144,20 @@ public class DrivetrainConstants {
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-        config.Voltage.PeakForwardVoltage = 12;
-        config.Voltage.PeakReverseVoltage = -12;
-
         config.Slot0.kV = 0;
         config.Slot0.kG = 0;
         config.Slot0.kS = 0;
-        config.Slot0.kP = 1.9 * (150/7);
+        config.Slot0.kP = 50;
         config.Slot0.kI = 0;
         config.Slot0.kD = 0;
+        config.Slot0.kA = 0;
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         config.Feedback.FeedbackRemoteSensorID = getEncoderID(module);
         config.Feedback.RotorToSensorRatio = 150/7;
+        config.Feedback.SensorToMechanismRatio = 1;
+
+        config.ClosedLoopGeneral.ContinuousWrap = true;
 
         config.Audio.BeepOnConfig = true;
         config.Audio.BeepOnBoot = true;

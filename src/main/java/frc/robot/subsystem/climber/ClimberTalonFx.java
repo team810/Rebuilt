@@ -5,10 +5,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import frc.robot.Robot;
@@ -21,6 +19,7 @@ public class ClimberTalonFx implements ClimberIO{
     private final TalonFX motor;
     private final PositionVoltage control;
 
+    private final StatusSignal<Angle> driveAngleSignal;
     private final StatusSignal<Voltage> driveVoltageSignal;
     private final StatusSignal<Temperature> driveTemperatureSignal;
     private final StatusSignal<Current> driveAppliedCurrentSignal;
@@ -57,6 +56,7 @@ public class ClimberTalonFx implements ClimberIO{
         control.EnableFOC = true;
         control.UpdateFreqHz = 1000;
 
+        driveAngleSignal = motor.getPosition();
         driveVoltageSignal = motor.getMotorVoltage();
         driveTemperatureSignal = motor.getDeviceTemp();
         driveAppliedCurrentSignal = motor.getStatorCurrent();
@@ -64,6 +64,7 @@ public class ClimberTalonFx implements ClimberIO{
 
         StatusSignal.setUpdateFrequencyForAll(
             50,
+            driveAngleSignal,
             driveVoltageSignal,
             driveTemperatureSignal,
             driveAppliedCurrentSignal,
@@ -80,21 +81,21 @@ public class ClimberTalonFx implements ClimberIO{
     @Override
     public void readPeriodic() {
         StatusSignal.refreshAll(
-                driveVoltageSignal,
-                driveTemperatureSignal,
-                driveAppliedCurrentSignal,
-                driveSupplyCurrentSignal
+            driveAngleSignal,
+            driveVoltageSignal,
+            driveTemperatureSignal,
+            driveAppliedCurrentSignal,
+            driveSupplyCurrentSignal
         );
 
         Logger.recordOutput("Climber/Motor/Voltage", driveVoltageSignal.getValue());
         Logger.recordOutput("Climber/Motor/Current", driveAppliedCurrentSignal.getValue());
         Logger.recordOutput("Climber/Motor/SupplyCurrent", driveSupplyCurrentSignal.getValue());
         Logger.recordOutput("Climber/Motor/Temperature", driveTemperatureSignal.getValue().in(Celsius));
-
     }
 
     @Override
-    public void setPivotState(DoubleSolenoid.Value value) {
+    public void setClampState(DoubleSolenoid.Value value) {
         solenoid.set(value);
     }
 
@@ -106,7 +107,16 @@ public class ClimberTalonFx implements ClimberIO{
     }
 
     @Override
-    public DoubleSolenoid.Value getPivotState(){
+    public Distance getCurrentHeight() {
+        Distance currentHeight = Distance.ofBaseUnits(
+            (driveAngleSignal.getValue().in(Rotations) / 75) * (2 * Math.PI * .0508),
+            Units.Meters
+        );
+        return currentHeight;
+    }
+
+    @Override
+    public DoubleSolenoid.Value getClampState(){
         return solenoid.get();
     }
 

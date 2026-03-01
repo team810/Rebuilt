@@ -142,7 +142,7 @@ public class Drivetrain {
     }
 
     public void simulationPeriodic() {
-        gyroSimState.addYaw((control.getSpeeds(getPose()).omegaRadiansPerSecond / (2 * Math.PI)) * 360 * Robot.PERIOD);
+        gyroSimState.addYaw((DrivetrainConstants.KINEMATICS.toChassisSpeeds(frontLeft.getCurrentState(),frontRight.getCurrentState(),backLeft.getCurrentState(),backRight.getCurrentState()).omegaRadiansPerSecond / (2 * Math.PI)) * 360 * Robot.PERIOD);
 
         frontLeft.simPeriodic();
         frontRight.simPeriodic();

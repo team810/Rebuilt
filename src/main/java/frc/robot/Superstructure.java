@@ -3,7 +3,9 @@ package frc.robot;
 import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -25,6 +27,7 @@ import frc.robot.subsystem.intake.IntakeSubsystem;
 import frc.robot.subsystem.mop.MopStates;
 import frc.robot.subsystem.mop.MopSubsystem;
 import frc.robot.subsystem.shooter.ShooterSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
 
@@ -108,7 +111,7 @@ public class Superstructure {
         // Drivetrain Input
         double horizontalInput = IO.getJoystick(Controls.horizontalVelocity).getAsDouble();
         double verticalInput = IO.getJoystick(Controls.verticalVelocity).getAsDouble();
-        double omegaInput = IO.getJoystick(Controls.omega).getAsDouble();
+        double omegaInput = -IO.getJoystick(Controls.omega).getAsDouble();
 
         if (alliance == DriverStation.Alliance.Blue) {
             horizontalInput *= -1;
@@ -125,7 +128,7 @@ public class Superstructure {
 
         LinearVelocity horizontalVelocity = LinearVelocity.ofBaseUnits(horizontalInput * DrivetrainConstants.MAX_VELOCITY, Units.MetersPerSecond);
         LinearVelocity verticalVelocity = LinearVelocity.ofBaseUnits(verticalInput * DrivetrainConstants.MAX_VELOCITY, Units.MetersPerSecond);
-        AngularVelocity omegaVelocity = AngularVelocity.ofBaseUnits(omegaInput * DrivetrainConstants.MAX_ANGULAR_VELOCITY, Units.RotationsPerSecond);
+        AngularVelocity omegaVelocity = AngularVelocity.ofBaseUnits(omegaInput * DrivetrainConstants.MAX_ANGULAR_VELOCITY, Units.RadiansPerSecond);
 
         switch (robotState) {
             case Default -> {
@@ -134,10 +137,7 @@ public class Superstructure {
 
                 manualDrive(robotPose, horizontalVelocity, verticalVelocity, omegaVelocity);
             }
-            case IntakeShooting -> {
-                ClimberSubsystem.getInstance().setState(ClimberStates.retract);
-                IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
-
+            case Shooting -> {
                 if (targetLockOn == ShooterTargetLockMode.AutoAlign) {
                     Drivetrain.getInstance().setControl(
                         new YawLockFOC(
@@ -149,18 +149,16 @@ public class Superstructure {
                 }else{
                     manualDrive(robotPose, horizontalVelocity, verticalVelocity, omegaVelocity);
                 }
-                if (Drivetrain.getInstance().getControl().atSetpoint()) {
-                    FeederSubsystem.getInstance().setState(FeederStates.FEED);
-                    MopSubsystem.getInstance().setState(MopStates.FEED);
-                }else{
-                    MopSubsystem.getInstance().setState(MopStates.OFF);
-                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
-                }
-            }
-            case Intake -> {
-                ClimberSubsystem.getInstance().setState(ClimberStates.retract);
-                IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
-                manualDrive(robotPose, horizontalVelocity, verticalVelocity, omegaVelocity);
+
+                // Auto shoot, if we decide to try it out
+//
+//                if (Drivetrain.getInstance().getControl().atSetpoint()) {
+//                    FeederSubsystem.getInstance().setState(FeederStates.FEED);
+//                    MopSubsystem.getInstance().setState(MopStates.FEED);
+//                }else{
+//                    MopSubsystem.getInstance().setState(MopStates.OFF);
+//                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
+//                }
             }
             case AligningClimb -> {
                 Pose2d alignPose = robotPose.nearest(NEAR_CLIMBER_ARRAY);
@@ -171,14 +169,8 @@ public class Superstructure {
                 MopSubsystem.getInstance().setState(MopStates.OFF);
                 FeederSubsystem.getInstance().setState(FeederStates.OFF);
             }
-            case Unclimbed -> {
-                ClimberSubsystem.getInstance().setState(ClimberStates.extend);
-                manualDrive(robotPose, horizontalVelocity, verticalVelocity, omegaVelocity);
-            }
-            case Climbing -> {
-                ClimberSubsystem.getInstance().setState(ClimberStates.climb);
-                MopSubsystem.getInstance().setState(MopStates.OFF);
-                FeederSubsystem.getInstance().setState(FeederStates.OFF);
+            case Auto -> {
+                // Do nothing
             }
         }
 
@@ -186,19 +178,13 @@ public class Superstructure {
         ClimberSubsystem.getInstance().writePeriodic();
         IntakeSubsystem.getInstance().writePeriodic();
         ShooterSubsystem.getInstance().writePeriodic();
+
+        loggingMechanism();
+        Logger.recordOutput("Robot State", robotState);
     }
 
     private void manualDrive(Pose2d robotPose, LinearVelocity horizontalVelocity, LinearVelocity verticalVelocity, AngularVelocity omegaVelocity) {
-        if (omegaVelocity.in(Units.RadiansPerSecond) != 0 && Drivetrain.getInstance().getRate().in(Units.RadiansPerSecond) >= DrivetrainConstants.BREAK_YAW_LOCK) {
-            Drivetrain.getInstance().setControl(
-                new VelocityFOC(
-                    horizontalVelocity,
-                    verticalVelocity,
-                    omegaVelocity
-                )
-            );
-            lockFirstTick = true;
-        }else{
+        if (omegaVelocity.in(Units.RadiansPerSecond) == 0 && Drivetrain.getInstance().getRate().in(Units.RadiansPerSecond) >= DrivetrainConstants.BREAK_YAW_LOCK) {
             if (lockFirstTick) {
                 lockAngle = robotPose.getRotation();
                 lockFirstTick = false;
@@ -210,6 +196,15 @@ public class Superstructure {
                     lockAngle
                 )
             );
+        }else{
+            Drivetrain.getInstance().setControl(
+                new VelocityFOC(
+                    horizontalVelocity,
+                    verticalVelocity,
+                    omegaVelocity
+                )
+            );
+            lockFirstTick = true;
         }
     }
 
@@ -225,6 +220,16 @@ public class Superstructure {
         lockAngle = rotation;
         lockFirstTick = true;
         Drivetrain.getInstance().resetPose(new Pose2d(xPosition, yPosition, rotation));
+    }
+
+    private void loggingMechanism() {
+        Pose3d intakePose = new Pose3d(0.2790, 0, 0.2414524,new Rotation3d());
+        if (IntakeSubsystem.getInstance().getState() == IntakeStates.Deployed || IntakeSubsystem.getInstance().getState() == IntakeStates.DeployedRevs){
+            intakePose = new Pose3d(0.259500, 0, 0.2454524,new Rotation3d(0,0,0));
+        }else{
+            intakePose = new Pose3d(0.259500, 0, 0.2454524,new Rotation3d(0,Math.toRadians(-98),0));
+        }
+        Logger.recordOutput("Mech", intakePose, ClimberSubsystem.getInstance().getClimberPose());
     }
 
     public void setAlliance(DriverStation.Alliance alliance) {

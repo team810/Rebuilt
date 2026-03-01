@@ -3,12 +3,9 @@ package frc.robot;
 public enum RobotStates {
     Default,
 
-    IntakeShooting, // With angle locked
-    Intake,
+    Shooting, // With angle locked
 
     AligningClimb,
-    Unclimbed,
-    Climbing,
 
-
+    Auto,
 }

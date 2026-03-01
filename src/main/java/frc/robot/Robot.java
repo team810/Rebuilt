@@ -7,10 +7,20 @@ package frc.robot;
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.IO.Controls;
 import frc.robot.IO.IO;
+import frc.robot.subsystem.climber.ClimberStates;
+import frc.robot.subsystem.climber.ClimberSubsystem;
 import frc.robot.subsystem.drivetrain.Drivetrain;
+import frc.robot.subsystem.feeder.FeederStates;
+import frc.robot.subsystem.feeder.FeederSubsystem;
+import frc.robot.subsystem.intake.IntakeStates;
+import frc.robot.subsystem.intake.IntakeSubsystem;
+import frc.robot.subsystem.mop.MopStates;
+import frc.robot.subsystem.mop.MopSubsystem;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -24,6 +34,18 @@ public class Robot extends LoggedRobot {
     private final Superstructure superstructure;
 
     private final Trigger resetGyroTrigger;
+
+    private final Trigger intakeTrigger;
+    private final Trigger reverseIntakeTrigger;
+
+    private final Trigger manualClimbUpTrigger;
+    private final Trigger manualClimbDownTrigger;
+    private final Trigger extendClimbTrigger;
+    private final Trigger retractClimbTrigger;
+
+    private final Trigger climbAlignTrigger;
+    private final Trigger shooterAlignTrigger;
+    private final Trigger shooterTrigger;
 
     public Robot() {
         Logger.addDataReceiver(new NT4Publisher());
@@ -41,6 +63,52 @@ public class Robot extends LoggedRobot {
 
         resetGyroTrigger = new Trigger(IO.getButton(Controls.resetGyro));
 
+        intakeTrigger = new Trigger(IO.getButton(Controls.intake));
+        intakeTrigger.whileTrue(new StartEndCommand(
+            () -> IntakeSubsystem.getInstance().setState(IntakeStates.Deployed),
+            () -> IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff)
+        ));
+
+        reverseIntakeTrigger = new Trigger(IO.getButton(Controls.reverseIntake));
+        reverseIntakeTrigger.whileTrue(new StartEndCommand(
+            () -> IntakeSubsystem.getInstance().setState(IntakeStates.DeployedRevs),
+            () -> IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff)
+        ));
+
+        manualClimbDownTrigger = new Trigger(IO.getButton(Controls.manualClimbDown)); // Need to add code in the climber subsystem to make this work
+        manualClimbUpTrigger = new Trigger(IO.getButton(Controls.manualClimbUp));
+
+        retractClimbTrigger = new Trigger(IO.getButton(Controls.retractClimb));
+        retractClimbTrigger.toggleOnTrue(new InstantCommand(() -> ClimberSubsystem.getInstance().setState(ClimberStates.retract)));
+
+        extendClimbTrigger = new Trigger(IO.getButton(Controls.extendClimb));
+        extendClimbTrigger.toggleOnTrue(new InstantCommand(() -> ClimberSubsystem.getInstance().setState(ClimberStates.extend)));
+
+        climbAlignTrigger = new Trigger(IO.getButton(Controls.climbAlign));
+        climbAlignTrigger.whileTrue(
+            new StartEndCommand(
+                () -> superstructure.setRobotState(RobotStates.AligningClimb),
+                () -> superstructure.setRobotState(RobotStates.Default)
+            )
+        );
+
+        shooterAlignTrigger = new Trigger(IO.getButton(Controls.alignShooting));
+        shooterAlignTrigger.whileTrue(new StartEndCommand(
+            () -> superstructure.setRobotState(RobotStates.Shooting),
+            () -> superstructure.setRobotState(RobotStates.Default)
+        ));
+
+        shooterTrigger = new Trigger(IO.getButton(Controls.shooting));
+        shooterTrigger.whileTrue(new StartEndCommand(
+            () -> {
+                MopSubsystem.getInstance().setState(MopStates.FEED);
+                FeederSubsystem.getInstance().setState(FeederStates.FEED);
+            },
+            () -> {
+                MopSubsystem.getInstance().setState(MopStates.OFF);
+                FeederSubsystem.getInstance().setState(FeederStates.OFF);
+            }
+        ));
     }
 
     @Override

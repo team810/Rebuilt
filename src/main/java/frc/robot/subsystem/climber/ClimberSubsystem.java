@@ -1,5 +1,8 @@
 package frc.robot.subsystem.climber;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import org.littletonrobotics.junction.Logger;
@@ -49,7 +52,11 @@ public class ClimberSubsystem {
     public void setState(ClimberStates state){
         this.state = state;
         io.setHeight(driveDistanceMap.get(state));
-        io.setPivotState(pistonMap.get(state));
+        io.setClampState(pistonMap.get(state));
+    }
+
+    public Pose3d getClimberPose() {
+        return new Pose3d(0,0,io.getCurrentHeight().in(Units.Meters),new Rotation3d());
     }
 
     public static ClimberSubsystem getInstance() {
