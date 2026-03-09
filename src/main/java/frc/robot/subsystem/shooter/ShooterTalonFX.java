@@ -36,7 +36,7 @@ public class ShooterTalonFX implements ShooterIO {
     private final VelocityVoltage control;
     private final Follower followerControl;
 
-    private AngularVelocity targetVelocity;
+    private double targetVelocity;
 
     public ShooterTalonFX() {
         if (Robot.isReal()) {
@@ -50,7 +50,7 @@ public class ShooterTalonFX implements ShooterIO {
         followerControl = new Follower(ShooterConstants.LEADER_MOTOR_ID, MotorAlignmentValue.Aligned);
 
         config = new TalonFXConfiguration();
-        config.CurrentLimits.SupplyCurrentLimit = 50;
+        config.CurrentLimits.SupplyCurrentLimit = 40;
         config.CurrentLimits.StatorCurrentLimit = 100;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -66,7 +66,7 @@ public class ShooterTalonFX implements ShooterIO {
 
         config.Slot0.kV = .125;
         config.Slot0.kA = 0;
-        config.Slot0.kP = 0.001;
+        config.Slot0.kP = .001;
         config.Slot0.kI = 0;
 
         leaderMotor.getConfigurator().apply(config);
@@ -136,6 +136,7 @@ public class ShooterTalonFX implements ShooterIO {
     @Override
     public void writePeriodic() {
         Logger.recordOutput("Shooter/Leader/TargetVelocity", targetVelocity);
+
         Logger.recordOutput("Shooter/Leader/Temperature", leaderTemperature.getValue());
         Logger.recordOutput("Shooter/Leader/SupplyCurrent", leaderSupplySignal.getValue());
         Logger.recordOutput("Shooter/Leader/StatorCurrent", leaderStatorSignal.getValue());
@@ -148,14 +149,13 @@ public class ShooterTalonFX implements ShooterIO {
         Logger.recordOutput("Shooter/Follower/VoltageSignal", followerVoltageSignal.getValue());
         Logger.recordOutput("Shooter/Follower/VelocitySignal", followerVelocitySignal.getValue());
 
-
-        control.Velocity = targetVelocity.in(Units.RotationsPerSecond);
+        control.Velocity = targetVelocity;
         leaderMotor.setControl(control);
         followerMotor.setControl(followerControl);
     }
 
     @Override
-    public void setVelocity(AngularVelocity velocity) {
+    public void setVelocity(double velocity) {
         this.targetVelocity = velocity;
 
     }

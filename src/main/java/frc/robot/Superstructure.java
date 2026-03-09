@@ -18,9 +18,11 @@ import frc.robot.subsystem.drivetrain.Drivetrain;
 import frc.robot.subsystem.drivetrain.DrivetrainConstants;
 import frc.robot.subsystem.drivetrain.control.VelocityFOC;
 import frc.robot.subsystem.drivetrain.control.YawLockFOC;
+import frc.robot.subsystem.feeder.FeederStates;
 import frc.robot.subsystem.feeder.FeederSubsystem;
 import frc.robot.subsystem.intake.IntakeStates;
 import frc.robot.subsystem.intake.IntakeSubsystem;
+import frc.robot.subsystem.mop.MopStates;
 import frc.robot.subsystem.mop.MopSubsystem;
 import frc.robot.subsystem.shooter.ShooterSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -96,13 +98,15 @@ public class Superstructure {
         } else if (shooterTarget == NEAR_HOPPER) {
             shooterTarget = HOPPER_TARGET;
         }
-        ShooterSubsystem.getInstance().setTarget(robotPose, shooterTarget);
+        ShooterSubsystem.getInstance().setTarget(robotPose, shooterTarget, (shooterTarget == FERRY_TARGET_LEFT || shooterTarget == FERRY_TARGET_RIGHT));
+        targetPose = shooterTarget;
 
         Logger.recordOutput("ShooterTarget", shooterTarget);
+        Logger.recordOutput("Distance", Math.sqrt(targetPose.relativeTo(Drivetrain.getInstance().getPose()).getX() * targetPose.relativeTo(Drivetrain.getInstance().getPose()).getX() + targetPose.relativeTo(Drivetrain.getInstance().getPose()).getY() * targetPose.relativeTo(Drivetrain.getInstance().getPose()).getY()));
 
         Rotation2d targetLock = new Rotation2d(
-            robotPose.getX() - shooterTarget.getX(),
-            robotPose.getY() - shooterTarget.getY()
+            robotPose.getX() - shooterTarget.getX() - .19,
+            robotPose.getY() - shooterTarget.getY() - .09207
         );
 
         // Drivetrain Input
@@ -147,13 +151,24 @@ public class Superstructure {
 
                 // Auto shoot, if we decide to try it out
 //
-//                if (Drivetrain.getInstance().getControl().atSetpoint()) {
-//                    FeederSubsystem.getInstance().setState(FeederStates.FEED);
-//                    MopSubsystem.getInstance().setState(MopStates.FEED);
-//                }else{
-//                    MopSubsystem.getInstance().setState(MopStates.OFF);
-//                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
-//                }
+                if (Drivetrain.getInstance().getControl().atSetpoint()) {
+                    FeederSubsystem.getInstance().setState(FeederStates.FEED);
+                    MopSubsystem.getInstance().setState(MopStates.FEED);
+                    if (IntakeSubsystem.getInstance().getState() == IntakeStates.Deployed){
+                        IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                    }else{
+                        IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                    }
+                    System.out.println("At Setpoint");
+                }else{
+                    MopSubsystem.getInstance().setState(MopStates.OFF);
+                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
+                    if (IntakeSubsystem.getInstance().getState() == IntakeStates.Deployed){
+                        IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                    }else{
+                        IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                    }
+                }
             }
             case Auto -> {
 

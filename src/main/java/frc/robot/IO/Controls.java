@@ -14,6 +14,7 @@ public enum Controls {
 
     intake,
     reverseIntake,
+    toggleIntake,
 
     retractClimb,
     extendClimb,

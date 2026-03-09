@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.IO.Controls;
 import frc.robot.IO.IO;
+import frc.robot.lib.LimelightHelpers;
 import frc.robot.subsystem.drivetrain.Drivetrain;
 import frc.robot.subsystem.feeder.FeederStates;
 import frc.robot.subsystem.feeder.FeederSubsystem;
@@ -39,6 +40,8 @@ public class Robot extends LoggedRobot {
     private final Trigger shooterAlignTrigger;
     private final Trigger shooterTrigger;
 
+    private final Trigger toggleIntakeTrigger;
+
     public Robot() {
         Logger.addDataReceiver(new NT4Publisher());
         if (Robot.isReal()){
@@ -57,41 +60,57 @@ public class Robot extends LoggedRobot {
         resetGyroTrigger = new Trigger(IO.getButton(Controls.resetGyro));
         resetGyroTrigger.onTrue(new InstantCommand(() -> superStructure.resetGyro()));
 
+        toggleIntakeTrigger = new Trigger(IO.getButton(Controls.toggleIntake));
+        toggleIntakeTrigger.onTrue(new InstantCommand(() -> {
+            if (IntakeSubsystem.getInstance().getState() == IntakeStates.Deployed || IntakeSubsystem.getInstance().getState() == IntakeStates.DeployedRevs) {
+                IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff);
+            }else {
+                IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+            }
+        }));
+
         intakeTrigger = new Trigger(IO.getButton(Controls.intake));
-        intakeTrigger.whileTrue(new StartEndCommand(
-            () -> IntakeSubsystem.getInstance().setState(IntakeStates.Deployed),
-            () -> IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff)
+        intakeTrigger.onTrue(new InstantCommand(
+            () -> IntakeSubsystem.getInstance().setState(IntakeStates.Deployed)
         ));
 
         reverseIntakeTrigger = new Trigger(IO.getButton(Controls.reverseIntake));
         reverseIntakeTrigger.whileTrue(new StartEndCommand(
-            () -> IntakeSubsystem.getInstance().setState(IntakeStates.DeployedRevs),
+            () -> {
+                IntakeSubsystem.getInstance().setState(IntakeStates.DeployedRevs);
+                FeederSubsystem.getInstance().setState(FeederStates.REVERSE);
+                MopSubsystem.getInstance().setState(MopStates.REVERSE);
+                },
             () -> IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff)
         ));
 
         shooterAlignTrigger = new Trigger(IO.getButton(Controls.alignShooting));
         shooterAlignTrigger.whileTrue(new StartEndCommand(
             () -> superStructure.setRobotState(RobotStates.Shooting),
-            () -> superStructure.setRobotState(RobotStates.Default)
+            () -> {
+                superStructure.setRobotState(RobotStates.Default);
+                MopSubsystem.getInstance().setState(MopStates.OFF);
+                FeederSubsystem.getInstance().setState(FeederStates.OFF);
+
+            }
         ));
 
         shooterTrigger = new Trigger(IO.getButton(Controls.shooting));
-        shooterTrigger.whileTrue(new StartEndCommand(
-            () -> {
-                MopSubsystem.getInstance().setState(MopStates.FEED);
-                FeederSubsystem.getInstance().setState(FeederStates.FEED);
-            },
-            () -> {
-                MopSubsystem.getInstance().setState(MopStates.OFF);
-                FeederSubsystem.getInstance().setState(FeederStates.OFF);
-            }
-        ));
+//        shooterTrigger.whileTrue(new StartEndCommand(
+//            () -> {
+//                MopSubsystem.getInstance().setState(MopStates.FEED);
+//                FeederSubsystem.getInstance().setState(FeederStates.FEED);
+//            },
+//            () -> {
+//                MopSubsystem.getInstance().setState(MopStates.OFF);
+//                FeederSubsystem.getInstance().setState(FeederStates.OFF);
+//            }
+//        ));
     }
 
     @Override
     public void robotPeriodic() {
         superStructure.readPeriodic();
-
         CommandScheduler.getInstance().run();
         superStructure.writePeriodic();
     }
@@ -106,6 +125,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
+        LimelightHelpers.SetThrottle("limelight-ashoote", 0);
+        LimelightHelpers.SetThrottle("limelight-bshoote", 0);
     }
 
     @Override
@@ -114,6 +135,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
+        LimelightHelpers.SetThrottle("limelight-ashoote", 200);
+        LimelightHelpers.SetThrottle("limelight-bshoote", 200);
     }
 
     @Override

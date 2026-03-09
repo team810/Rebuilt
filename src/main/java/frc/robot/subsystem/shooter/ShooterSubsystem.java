@@ -9,18 +9,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.littletonrobotics.junction.Logger;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 public class ShooterSubsystem extends ShooterTalonFX {
     private static ShooterSubsystem INSTANCE = new ShooterSubsystem();
 
     private Distance distanceToTarget;
-    private AngularVelocity targetVelocity;
+    private double targetVelocity;
 
     private ShooterState state;
 
     private final ShooterIO shooter;
-
 
     private final SendableChooser<ShooterState> stateChooser;
     private AngularVelocity testVelocity = AngularVelocity.ofBaseUnits(0,Units.RotationsPerSecond);
@@ -36,7 +36,7 @@ public class ShooterSubsystem extends ShooterTalonFX {
         setState(ShooterState.OFF);
 
         SmartDashboard.putData("Shooter State", stateChooser);
-        SmartDashboard.putNumber("Test RPM", testVelocity.in(RotationsPerSecond) * 60);
+        SmartDashboard.putNumber("Test RPS", testVelocity.in(RotationsPerSecond));
 
         shooter = new ShooterTalonFX();
     }
@@ -50,7 +50,7 @@ public class ShooterSubsystem extends ShooterTalonFX {
     @Override
     public void writePeriodic() {
         Logger.recordOutput("Shooter/Distance", distanceToTarget);
-        Logger.recordOutput("Shooter/Velocity", targetVelocity);
+        Logger.recordOutput("Shooter/TargetVelocity", targetVelocity);
 
 
         switch(state) {
@@ -58,23 +58,28 @@ public class ShooterSubsystem extends ShooterTalonFX {
                 shooter.setVelocity(targetVelocity);
             }
             case TEST -> {
-                testVelocity = AngularVelocity.ofBaseUnits(SmartDashboard.getNumber("Test RPM",0) / 60, RotationsPerSecond);
-                shooter.setVelocity(testVelocity);
+                shooter.setVelocity(SmartDashboard.getNumber("Test RPS",0));
             }
             case OFF -> {
-                shooter.setVelocity(AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond));
+                shooter.setVelocity(0);
             }
         }
 
         shooter.writePeriodic();
     }
 
-    public void setTarget(Pose2d currentPose, Pose2d targetPose) {
+    public void setTarget(Pose2d currentPose, Pose2d targetPose, boolean ferry) {
+        double x = currentPose.getX() - targetPose.getX();
+        double y = currentPose.getY() - targetPose.getY();
         distanceToTarget = Distance.ofBaseUnits(
-            Math.sqrt((Math.pow(currentPose.getX(), 2) - Math.pow(targetPose.getX(), 2)) + (Math.pow(currentPose.getY(), 2)-Math.pow(targetPose.getY(), 2))),
+            Math.sqrt(x * x + y * y),
             Units.Meters
         );
-        targetVelocity = AngularVelocity.ofBaseUnits(1510 + (217 * distanceToTarget.in(Meters)) - (3.81 * distanceToTarget.in(Meters) * distanceToTarget.in(Meters)), RPM.getBaseUnit());
+        if (ferry) {
+            distanceToTarget = Distance.ofBaseUnits(distanceToTarget.in(Meters) - 2.5, Meters);
+        }
+        targetVelocity = 29.9 + (9.125 * distanceToTarget.in(Meters)) - (.255 * distanceToTarget.in(Meters) * distanceToTarget.in(Meters));
+
     }
 
     public void setState(ShooterState state) {

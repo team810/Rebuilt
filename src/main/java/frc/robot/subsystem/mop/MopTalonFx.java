@@ -35,7 +35,7 @@ public class MopTalonFx implements MopIO {
         TalonFXConfiguration mopConfig = new TalonFXConfiguration();
         mopConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         mopConfig.CurrentLimits.SupplyCurrentLimit = 40;
-        mopConfig.CurrentLimits.StatorCurrentLimit = 80;
+        mopConfig.CurrentLimits.StatorCurrentLimit = 40;
         mopConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         mopConfig.Voltage.PeakForwardVoltage = 12;
         mopConfig.Voltage.PeakReverseVoltage = -12;

@@ -1,5 +1,6 @@
 package frc.robot.subsystem.drivetrain.control;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -7,6 +8,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import frc.robot.subsystem.drivetrain.Drivetrain;
 import frc.robot.subsystem.drivetrain.DrivetrainConstants;
 
 public class YawLockFOC implements DrivetrainControlIO{
@@ -29,7 +31,7 @@ public class YawLockFOC implements DrivetrainControlIO{
                 DrivetrainConstants.THETA_KD
         );
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        thetaController.setTolerance(.05);
+        thetaController.setTolerance(.2);
     }
 
     @Override
@@ -49,6 +51,6 @@ public class YawLockFOC implements DrivetrainControlIO{
 
     @Override
     public boolean atSetpoint() {
-        return thetaController.atSetpoint();
+        return MathUtil.isNear(angleLock.getRadians(), Drivetrain.getInstance().getPose().getRotation().getRadians(), .2);
     }
 }

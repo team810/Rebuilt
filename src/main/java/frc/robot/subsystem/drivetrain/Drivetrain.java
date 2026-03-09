@@ -62,6 +62,8 @@ public class Drivetrain {
         );
 
         control = new VelocityFOC(0,0,0);
+        LimelightHelpers.setCameraPose_RobotSpace("limelight-bshoote", -.29845,.2452,.352,0,0,-90);
+        LimelightHelpers.setCameraPose_RobotSpace("limelight-ashoote", -.29845,.2452,.352,0,0,-90);
     }
 
     public void readPeriodic() {
@@ -72,6 +74,9 @@ public class Drivetrain {
         backLeft.readPeriodic();
         backRight.readPeriodic();
 
+        addVision("limelight-bshoote");
+        addVision("limelight-bshoote");
+
         odometry.update(
             new Rotation2d(yawSignal.getValue().in(Units.Radians)),
             new SwerveModulePosition[] {
@@ -81,10 +86,7 @@ public class Drivetrain {
                 backRight.getCurrentPosition()
             }
         );
-
         // Vision Updating
-
-        addVision(DrivetrainConstants.LIMELIGHT_SHOOTER);
 
         Logger.recordOutput("Pose", odometry.getEstimatedPosition());
         Logger.recordOutput(
@@ -94,6 +96,7 @@ public class Drivetrain {
             backLeft.getCurrentState(),
             backRight.getCurrentState()
         );
+
 
     }
 
