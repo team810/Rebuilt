@@ -1,6 +1,5 @@
-package frc.robot;
+package frc.robot.command;
 
-import choreo.trajectory.EventMarker;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
@@ -9,21 +8,15 @@ import frc.robot.subsystem.drivetrain.Drivetrain;
 import frc.robot.subsystem.drivetrain.control.TrajectoryControl;
 import frc.robot.subsystem.drivetrain.control.VelocityFOC;
 
-import java.util.List;
-
 public class PathFollower extends Command {
     private final Trajectory<SwerveSample> trajectory;
-    private final edu.wpi.first.wpilibj.Timer timer;
-    private final List<EventMarker> markers;
+    private final Timer timer;
 
     private TrajectoryControl control;
 
     public PathFollower(Trajectory<SwerveSample> trajectory) {
         timer = new Timer();
         this.trajectory = trajectory;
-        markers = trajectory.events();
-
-        control = new TrajectoryControl(trajectory.getInitialSample(false).get());
     }
 
     @Override

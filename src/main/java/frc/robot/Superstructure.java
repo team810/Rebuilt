@@ -1,5 +1,8 @@
 package frc.robot;
 
+import choreo.Choreo;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,8 +15,10 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.IO.Controls;
 import frc.robot.IO.IO;
+import frc.robot.command.PathFollower;
 import frc.robot.subsystem.drivetrain.Drivetrain;
 import frc.robot.subsystem.drivetrain.DrivetrainConstants;
 import frc.robot.subsystem.drivetrain.control.VelocityFOC;
@@ -28,18 +33,24 @@ import frc.robot.subsystem.shooter.ShooterSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Superstructure {
+    private static Superstructure INSTANCE = new Superstructure();
+    public static Superstructure getInstance() {
+        return INSTANCE;
+    }
+
     private RobotStates robotState;
 
     private DriverStation.Alliance alliance;
-
     private Pose2d FERRY_TARGET_LEFT = new Pose2d();
     private Pose2d FERRY_TARGET_RIGHT = new Pose2d();
-    private Pose2d HOPPER_TARGET = new Pose2d();
 
+    private Pose2d HOPPER_TARGET = new Pose2d();
     private Pose2d NEAR_FERRY_LEFT = new Pose2d();
     private Pose2d NEAR_FERRY_RIGHT = new Pose2d();
+
     private Pose2d NEAR_HOPPER = new Pose2d();
 
     private Pose2d targetPose = new Pose2d();
@@ -47,9 +58,21 @@ public class Superstructure {
     private final ArrayList<Pose2d> NEAR_TARGET_ARRAY = new ArrayList<>();
 
     private Pose2d shooterTarget = new Pose2d();
-
     private Rotation2d lockAngle;
+
     private boolean lockFirstTick;
+
+    private final Pose2d LEFT_START_POSE = new Pose2d();
+    private final Pose2d RIGHT_START_POSE = new Pose2d();
+
+    private enum Paths {
+        Left,
+        Right,
+        Center;
+    }
+    private final SendableChooser<Paths> autoChooser;
+    private Paths autoPath = Paths.Left;
+    private Command autoCommand = new InstantCommand(() -> System.out.println("No Autos"));
 
     public void setRobotState(RobotStates robotState) {
         this.robotState = robotState;
@@ -60,10 +83,11 @@ public class Superstructure {
         None
     }
 
+
     private final SendableChooser<ShooterTargetLockMode> lockShooterChooser;
     private ShooterTargetLockMode targetLockOn = ShooterTargetLockMode.AutoAlign;
 
-    public Superstructure(){
+    private Superstructure(){
         setRobotState(RobotStates.Default);
         ChoreoAllianceFlipUtil.setYear(2026);
         setAlliance(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue));
@@ -73,6 +97,15 @@ public class Superstructure {
         lockShooterChooser.setDefaultOption("Auto Align On", ShooterTargetLockMode.AutoAlign);
         lockShooterChooser.addOption("Auto Align Off", ShooterTargetLockMode.None);
         lockShooterChooser.onChange(this::setTargetLock);
+
+        autoChooser = new SendableChooser<>();
+        autoChooser.setDefaultOption("Left", Paths.Left);
+        autoChooser.addOption("Right", Paths.Right);
+        autoChooser.addOption("Center", Paths.Center);
+        autoChooser.onChange(this::generateAuto);
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        autoPath = Paths.Left;
 
         lockFirstTick = false;
         lockAngle = new Rotation2d();
@@ -184,6 +217,13 @@ public class Superstructure {
         Logger.recordOutput("Target Pose", targetPose);
     }
 
+    public void setPose(Pose2d pose) {
+        Drivetrain.getInstance().resetPose(pose);
+    }
+
+    public Command getAutonomousCommand() {
+        return autoCommand;
+    }
     private void manualDrive(Pose2d robotPose, LinearVelocity horizontalVelocity, LinearVelocity verticalVelocity, AngularVelocity omegaVelocity) {
         if (omegaVelocity.in(Units.RadiansPerSecond) == 0 && Drivetrain.getInstance().getRate().in(Units.RadiansPerSecond) >= DrivetrainConstants.BREAK_YAW_LOCK) {
             if (lockFirstTick) {
@@ -258,8 +298,68 @@ public class Superstructure {
         NEAR_TARGET_ARRAY.add(NEAR_FERRY_LEFT);
         NEAR_TARGET_ARRAY.add(NEAR_FERRY_RIGHT);
         NEAR_TARGET_ARRAY.add(NEAR_HOPPER);
+
+        generateAuto(autoPath);
     }
 
+    private Trajectory<SwerveSample> loadTrajectory(String trajectoryName) {
+        Optional<Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory(trajectoryName);
+        if (trajectory.isPresent()) {
+            System.out.println("Trajectory loaded: " + trajectoryName);
+            return trajectory.get();
+        }else{
+            System.out.println("Trajectory not found: " + trajectoryName);
+        }
+        return null;
+    }
+
+    private void generateAuto(Paths path) {
+        autoPath = path;
+        SequentialCommandGroup cmd = new SequentialCommandGroup();
+        if (path == Paths.Left ||  path == Paths.Right) {
+            Trajectory<SwerveSample> grabMiddle = null;
+            Pose2d handoffPose = new Pose2d();
+            switch (path) {
+                case Left:
+                    grabMiddle = loadTrajectory("leftIntake");
+                    break;
+                case Right:
+                    grabMiddle = loadTrajectory("rightIntake");
+                    break;
+            }
+            handoffPose = grabMiddle.getInitialPose(false).get();
+            setPose(handoffPose);
+            if (getAlliance() == DriverStation.Alliance.Red) {
+                grabMiddle = grabMiddle.flipped();
+            }
+            autoCommand = new SequentialCommandGroup(
+                new InstantCommand(() -> setRobotState(RobotStates.Shooting)),
+                new WaitCommand(4),
+                new InstantCommand(() -> {
+                    setRobotState(RobotStates.Auto);
+                    MopSubsystem.getInstance().setState(MopStates.OFF);
+                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
+                    IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                }),
+                new PathFollower(grabMiddle),
+                new ParallelRaceGroup(
+                    new InstantCommand(() -> Superstructure.getInstance().setRobotState(RobotStates.Shooting)),
+                    new WaitCommand(4)
+                ),
+                new InstantCommand(() -> {
+                    MopSubsystem.getInstance().setState(MopStates.OFF);
+                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
+                    Superstructure.getInstance().setRobotState(RobotStates.Auto);
+                    IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                }),
+                new PathFollower(grabMiddle)
+            );
+        }
+    }
+
+    public Command getAuto() {
+        return autoCommand;
+    }
     private void setTargetLock(ShooterTargetLockMode targetLock) {
         this.targetLockOn = targetLock;
     }

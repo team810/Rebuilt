@@ -30,8 +30,6 @@ public class Robot extends LoggedRobot {
     public static final double PERIOD = .020; // 20 milliseconds
     public static final CANBus MECH_CANBUS = new CANBus("mech");
 
-    private final Superstructure superStructure;
-
     private final Trigger resetGyroTrigger;
 
     private final Trigger intakeTrigger;
@@ -42,6 +40,7 @@ public class Robot extends LoggedRobot {
 
     private final Trigger toggleIntakeTrigger;
 
+
     public Robot() {
         Logger.addDataReceiver(new NT4Publisher());
         if (Robot.isReal()){
@@ -50,15 +49,14 @@ public class Robot extends LoggedRobot {
         Logger.start();
 
         IO.Init();
-        superStructure = new Superstructure();
-        superStructure.setAlliance(DriverStation.Alliance.Blue);
-        superStructure.setRobotState(RobotStates.Default);
+        Superstructure.getInstance().setAlliance(DriverStation.Alliance.Blue);
+        Superstructure.getInstance().setRobotState(RobotStates.Default);
 
         CommandScheduler.getInstance().enable();
         CommandScheduler.getInstance().setPeriod(PERIOD);
 
         resetGyroTrigger = new Trigger(IO.getButton(Controls.resetGyro));
-        resetGyroTrigger.onTrue(new InstantCommand(() -> superStructure.resetGyro()));
+        resetGyroTrigger.onTrue(new InstantCommand(() -> Superstructure.getInstance().resetGyro()));
 
         toggleIntakeTrigger = new Trigger(IO.getButton(Controls.toggleIntake));
         toggleIntakeTrigger.onTrue(new InstantCommand(() -> {
@@ -86,9 +84,9 @@ public class Robot extends LoggedRobot {
 
         shooterAlignTrigger = new Trigger(IO.getButton(Controls.alignShooting));
         shooterAlignTrigger.whileTrue(new StartEndCommand(
-            () -> superStructure.setRobotState(RobotStates.Shooting),
+            () -> Superstructure.getInstance().setRobotState(RobotStates.Shooting),
             () -> {
-                superStructure.setRobotState(RobotStates.Default);
+                Superstructure.getInstance().setRobotState(RobotStates.Default);
                 MopSubsystem.getInstance().setState(MopStates.OFF);
                 FeederSubsystem.getInstance().setState(FeederStates.OFF);
 
@@ -110,17 +108,19 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
-        superStructure.readPeriodic();
+        Superstructure.getInstance().readPeriodic();
         CommandScheduler.getInstance().run();
-        superStructure.writePeriodic();
+        Superstructure.getInstance().writePeriodic();
     }
 
     @Override
     public void autonomousInit() {
+        CommandScheduler.getInstance().schedule(Superstructure.getInstance().getAutonomousCommand());
     }
 
     @Override
     public void autonomousPeriodic() {
+
     }
 
     @Override
@@ -141,7 +141,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
-        superStructure.setAlliance(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue));
+        Superstructure.getInstance().setAlliance(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue));
     }
 
     @Override

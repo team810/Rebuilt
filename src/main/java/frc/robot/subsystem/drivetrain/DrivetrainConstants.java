@@ -22,7 +22,7 @@ public class DrivetrainConstants {
     public final static double THETA_KI = 0;
     public final static double THETA_KD = 0;
 
-    public final static double LINEAR_KP = 0;
+    public final static double LINEAR_KP = 4;
     public final static double LINEAR_KI = 0;
     public final static double LINEAR_KD = 0;
 

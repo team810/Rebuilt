@@ -18,14 +18,14 @@ public class TrajectoryControl implements DrivetrainControlIO {
         this.sample = sample;
 
         horizontalController = new PIDController(
-                DrivetrainConstants.LINEAR_KP,
-                DrivetrainConstants.LINEAR_KI,
-                DrivetrainConstants.LINEAR_KD
+                4,
+                0,
+                0
         );
         verticalController = new PIDController(
-                DrivetrainConstants.LINEAR_KP,
-                DrivetrainConstants.LINEAR_KI,
-                DrivetrainConstants.LINEAR_KD
+                4,
+                0,
+                0
         );
         thetaController = new PIDController(
                 DrivetrainConstants.THETA_KP,
