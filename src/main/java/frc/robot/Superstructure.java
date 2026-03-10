@@ -103,8 +103,8 @@ public class Superstructure {
         autoChooser.addOption("Right", Paths.Right);
         autoChooser.addOption("Center", Paths.Center);
         autoChooser.onChange(this::generateAuto);
-
         SmartDashboard.putData("Auto Chooser", autoChooser);
+
         autoPath = Paths.Left;
 
         lockFirstTick = false;
@@ -315,7 +315,6 @@ public class Superstructure {
 
     private void generateAuto(Paths path) {
         autoPath = path;
-        SequentialCommandGroup cmd = new SequentialCommandGroup();
         if (path == Paths.Left ||  path == Paths.Right) {
             Trajectory<SwerveSample> grabMiddle = null;
             Pose2d handoffPose = new Pose2d();
@@ -327,11 +326,11 @@ public class Superstructure {
                     grabMiddle = loadTrajectory("rightIntake");
                     break;
             }
-            handoffPose = grabMiddle.getInitialPose(false).get();
-            setPose(handoffPose);
             if (getAlliance() == DriverStation.Alliance.Red) {
                 grabMiddle = grabMiddle.flipped();
             }
+            handoffPose = grabMiddle.getInitialPose(false).get();
+            setPose(handoffPose);
             autoCommand = new SequentialCommandGroup(
                 new InstantCommand(() -> setRobotState(RobotStates.Shooting)),
                 new WaitCommand(4),
@@ -342,10 +341,8 @@ public class Superstructure {
                     IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
                 }),
                 new PathFollower(grabMiddle),
-                new ParallelRaceGroup(
-                    new InstantCommand(() -> Superstructure.getInstance().setRobotState(RobotStates.Shooting)),
-                    new WaitCommand(4)
-                ),
+                new InstantCommand(() -> setRobotState(RobotStates.Shooting)),
+                new WaitCommand(4),
                 new InstantCommand(() -> {
                     MopSubsystem.getInstance().setState(MopStates.OFF);
                     FeederSubsystem.getInstance().setState(FeederStates.OFF);

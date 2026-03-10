@@ -27,9 +27,8 @@ public class PathFollower extends Command {
 
     @Override
     public void execute() {
-        Drivetrain.getInstance().setControl(new TrajectoryControl(
-            trajectory.sampleAt(timer.get(),false).get()
-        ));
+        control = new TrajectoryControl(trajectory.sampleAt(timer.get(),false).get());
+        Drivetrain.getInstance().setControl(control);
     }
 
 

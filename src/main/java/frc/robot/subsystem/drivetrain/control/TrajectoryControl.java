@@ -2,9 +2,11 @@ package frc.robot.subsystem.drivetrain.control;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.TrajectorySample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.subsystem.drivetrain.Drivetrain;
 import frc.robot.subsystem.drivetrain.DrivetrainConstants;
 
 public class TrajectoryControl implements DrivetrainControlIO {
@@ -18,12 +20,12 @@ public class TrajectoryControl implements DrivetrainControlIO {
         this.sample = sample;
 
         horizontalController = new PIDController(
-                4,
+                5,
                 0,
                 0
         );
         verticalController = new PIDController(
-                4,
+                5,
                 0,
                 0
         );
@@ -44,14 +46,25 @@ public class TrajectoryControl implements DrivetrainControlIO {
         ChassisSpeeds speeds = new ChassisSpeeds(
             horizontalController.calculate(currentPose.getX(), sample.getPose().getX()) + sample.getChassisSpeeds().vxMetersPerSecond,
             verticalController.calculate(currentPose.getY(), sample.getPose().getY()) + sample.getChassisSpeeds().vyMetersPerSecond,
-            thetaController.calculate(currentPose.getRotation().getRadians() + sample.getPose().getRotation().getRadians()) + sample.getChassisSpeeds().omegaRadiansPerSecond
+            thetaController.calculate(currentPose.getRotation().getRadians(), sample.getPose().getRotation().getRadians()) + sample.getChassisSpeeds().omegaRadiansPerSecond
         );
         speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, currentPose.getRotation());
+
         return speeds;
     }
 
     @Override
     public boolean atSetpoint() {
-        return horizontalController.atSetpoint() && verticalController.atSetpoint() && thetaController.atSetpoint();
+        Pose2d targetPose = sample.getPose();
+        Pose2d currentPose = Drivetrain.getInstance().getPose();
+        return
+            MathUtil.isNear(targetPose.getX() - currentPose.getX(), 0, .05) &&
+            MathUtil.isNear(targetPose.getY() - currentPose.getY(), 0, .05) &&
+            MathUtil.isNear(targetPose.getRotation().getRadians() - currentPose.getRotation().getRadians(), 0, .05);
+    }
+
+    @Override
+    public Pose2d getTargetPose() {
+        return sample.getPose();
     }
 }

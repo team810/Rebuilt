@@ -53,4 +53,9 @@ public class YawLockFOC implements DrivetrainControlIO{
     public boolean atSetpoint() {
         return MathUtil.isNear(angleLock.getRadians(), Drivetrain.getInstance().getPose().getRotation().getRadians(), .2);
     }
+
+    @Override
+    public Pose2d getTargetPose() {
+        return new Pose2d(Drivetrain.getInstance().getPose().getX(), Drivetrain.getInstance().getPose().getY(), angleLock);
+    }
 }

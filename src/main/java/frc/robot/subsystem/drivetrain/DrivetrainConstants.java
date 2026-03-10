@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Robot;
 
 public class DrivetrainConstants {
     public final static CANBus DRIVETRAIN_CANBUS = new CANBus("drivetrain");
@@ -147,6 +148,9 @@ public class DrivetrainConstants {
         config.Slot0.kG = 0;
         config.Slot0.kS = 0;
         config.Slot0.kP = 85;
+        if (Robot.isSimulation()) {
+            config.Slot0.kP = 400000;
+        }
         config.Slot0.kI = 0;
         config.Slot0.kD = 0;
         config.Slot0.kA = 0;

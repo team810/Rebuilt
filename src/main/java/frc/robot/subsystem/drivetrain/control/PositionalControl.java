@@ -52,4 +52,9 @@ public class PositionalControl implements DrivetrainControlIO{
     public boolean atSetpoint() {
         return horizontalController.atSetpoint() && verticalController.atSetpoint() && thetaController.atSetpoint();
     }
+
+    @Override
+    public Pose2d getTargetPose() {
+        return targetPose;
+    }
 }

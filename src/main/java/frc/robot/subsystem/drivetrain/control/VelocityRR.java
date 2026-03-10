@@ -25,4 +25,9 @@ public class VelocityRR implements DrivetrainControlIO{
     public boolean atSetpoint() {
         return true;
     }
+
+    @Override
+    public Pose2d getTargetPose() {
+        return null;
+    }
 }

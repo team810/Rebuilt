@@ -142,6 +142,7 @@ public class Drivetrain {
         backRight.writePeriodic();
 
         Logger.recordOutput("Drivetrain/TargetStates",states);
+        Logger.recordOutput("Drivetrain/TargetPoseBudy", control.getTargetPose());
     }
 
     public void simulationPeriodic() {

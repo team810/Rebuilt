@@ -21,12 +21,12 @@
    },
    "Right_Trench":{
     "x":{
-     "exp":"0 m",
-     "val":0.0
+     "exp":"3.5 m",
+     "val":3.5
     },
     "y":{
-     "exp":"0 m",
-     "val":0.0
+     "exp":"0.65 m",
+     "val":0.65
     },
     "heading":{
      "exp":"0 rad",
@@ -57,32 +57,32 @@
    }
   },
   "mass":{
-   "exp":"150 lbs",
-   "val":68.0388555
+   "exp":"135 lbs",
+   "val":61.23496995
   },
   "inertia":{
    "exp":"6 kg m ^ 2",
    "val":6.0
   },
   "gearing":{
-   "exp":"6.5",
-   "val":6.5
+   "exp":"5.9",
+   "val":5.9
   },
   "radius":{
    "exp":"2 in",
    "val":0.0508
   },
   "vmax":{
-   "exp":"6000 RPM",
-   "val":628.3185307179587
+   "exp":"5800 RPM",
+   "val":607.3745796940267
   },
   "tmax":{
    "exp":"1.2 N * m",
    "val":1.2
   },
   "cof":{
-   "exp":"1.5",
-   "val":1.5
+   "exp":"1",
+   "val":1.0
   },
   "bumper":{
    "front":{
