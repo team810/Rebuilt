@@ -24,6 +24,8 @@ public class IO {
         controlsDigital.put(Controls.reverseIntake, () -> primary.getYButton());
         controlsDigital.put(Controls.alignShooting, () -> primary.getRightTriggerAxis() > .7);
         controlsDigital.put(Controls.shooting, () -> primary.getYButton());
+
+        controlsDigital.put(Controls.trenchAutoAlign, () -> primary.getRightBumperButton());
     }
 
      public static DoubleSupplier getJoystick(Controls controls) {

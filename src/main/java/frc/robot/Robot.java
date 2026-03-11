@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.IO.Controls;
 import frc.robot.IO.IO;
+import frc.robot.command.DriveToCommand;
 import frc.robot.lib.LimelightHelpers;
 import frc.robot.subsystem.drivetrain.Drivetrain;
 import frc.robot.subsystem.feeder.FeederStates;
@@ -24,6 +27,9 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 public class Robot extends LoggedRobot {
@@ -40,6 +46,7 @@ public class Robot extends LoggedRobot {
 
     private final Trigger toggleIntakeTrigger;
 
+    private final Trigger trenchAutoAlignTrigger;
 
     public Robot() {
         Logger.addDataReceiver(new NT4Publisher());
@@ -94,6 +101,7 @@ public class Robot extends LoggedRobot {
         ));
 
         shooterTrigger = new Trigger(IO.getButton(Controls.shooting));
+
 //        shooterTrigger.whileTrue(new StartEndCommand(
 //            () -> {
 //                MopSubsystem.getInstance().setState(MopStates.FEED);
@@ -104,6 +112,18 @@ public class Robot extends LoggedRobot {
 //                FeederSubsystem.getInstance().setState(FeederStates.OFF);
 //            }
 //        ));
+
+        trenchAutoAlignTrigger = new Trigger(IO.getButton(Controls.trenchAutoAlign));
+        trenchAutoAlignTrigger.whileTrue(new DriveToCommand(trenchAlign()));
+    }
+
+    public Pose2d trenchAlign() {
+        Collection<Pose2d> poseList = new ArrayList<>();
+        poseList.add(new Pose2d(5.770099639892578, 7.360217571258545, new Rotation2d(0)));
+        poseList.add(new Pose2d(5.882756233215332,0.5632885694503784, new Rotation2d(0)));
+        poseList.add(new Pose2d(3.509453058242798,0.5126494765281677, new Rotation2d(Math.PI)));
+        poseList.add(new Pose2d(3.3292129039764404,7.322665214538574, new Rotation2d(Math.PI)));
+        return Drivetrain.getInstance().getPose().nearest(poseList);
     }
 
     @Override
@@ -125,6 +145,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
+        Superstructure.getInstance().setRobotState(RobotStates.Default);
         LimelightHelpers.SetThrottle("limelight-ashoote", 0);
         LimelightHelpers.SetThrottle("limelight-bshoote", 0);
     }
@@ -141,7 +162,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
-        Superstructure.getInstance().setAlliance(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue));
+        Superstructure.getInstance().disablePeriodic();
     }
 
     @Override

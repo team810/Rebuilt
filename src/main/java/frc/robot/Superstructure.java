@@ -351,9 +351,52 @@ public class Superstructure {
                 }),
                 new PathFollower(grabMiddle)
             );
+        }else{
+            Pose2d handoffPose = new Pose2d();
+            Trajectory<SwerveSample> part1 = loadTrajectory("middlePart1");
+            Trajectory<SwerveSample> part2 = loadTrajectory("middlePart2");
+            if (getAlliance() == DriverStation.Alliance.Red) {
+                part1 = part1.flipped();
+            }
+            handoffPose = part1.getInitialPose(false).get();
+            setPose(handoffPose);
+            autoCommand = new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    Superstructure.getInstance().setRobotState(RobotStates.Shooting);
+                }),
+                new WaitCommand(4),
+                new InstantCommand(() -> {
+                    MopSubsystem.getInstance().setState(MopStates.OFF);
+                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
+                    Superstructure.getInstance().setRobotState(RobotStates.Auto);
+                    IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                }),
+                new PathFollower(part1.getSplit(0).get()),
+                new WaitCommand(2),
+                new PathFollower(part1.getSplit(1).get()),
+                new InstantCommand(() -> {
+                    Superstructure.getInstance().setRobotState(RobotStates.Shooting);
+                }),
+                new WaitCommand(4),
+                new InstantCommand(() -> {
+                    MopSubsystem.getInstance().setState(MopStates.OFF);
+                    FeederSubsystem.getInstance().setState(FeederStates.OFF);
+                    Superstructure.getInstance().setRobotState(RobotStates.Auto);
+                    IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                }),
+                new PathFollower(part2),
+                new InstantCommand(() -> {
+                    Superstructure.getInstance().setRobotState(RobotStates.Auto);
+                })
+            );
         }
     }
-
+    public void disablePeriodic() {
+        if (alliance != DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)) {
+            generateAuto(autoPath);
+            setAlliance(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue));
+        }
+    }
     public Command getAuto() {
         return autoCommand;
     }

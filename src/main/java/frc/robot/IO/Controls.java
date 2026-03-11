@@ -21,4 +21,6 @@ public enum Controls {
 
     manualClimbUp,
     manualClimbDown,
+
+    trenchAutoAlign
 }
