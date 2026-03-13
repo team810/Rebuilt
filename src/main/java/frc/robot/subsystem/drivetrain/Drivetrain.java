@@ -117,9 +117,6 @@ public class Drivetrain {
 
                 double xyStds = Math.sqrt((.6 * (results.avgTagArea + .25))) - .15;
 
-                if (results.tagCount >= 2){
-                    xyStds *= .4;
-                }
                 odometry.setVisionMeasurementStdDevs(VecBuilder.fill(xyStds, xyStds, 250000000));
                 odometry.addVisionMeasurement(results.pose, results.timestampSeconds);
             }

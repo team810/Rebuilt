@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 public class IO {
     private static final XboxController primary = new XboxController(0);
+    private static final XboxController secondary = new XboxController(1);
 
     private static final HashMap<Controls, DoubleSupplier> controlsAnalog = new HashMap<>();
     private static final HashMap<Controls, BooleanSupplier> controlsDigital = new HashMap<>();
@@ -18,9 +19,9 @@ public class IO {
         controlsAnalog.put(Controls.omega, () -> primary.getRightX());
 
         controlsDigital.put(Controls.resetGyro, () -> primary.getAButton());
-        controlsDigital.put(Controls.toggleIntake, () -> primary.getLeftBumperButton());
+        controlsDigital.put(Controls.toggleIntake, () -> secondary.getRightBumperButton());
 
-        controlsDigital.put(Controls.intake, () -> primary.getLeftTriggerAxis() > .7);
+        controlsDigital.put(Controls.intake, () -> secondary.getRightTriggerAxis()> .7);
         controlsDigital.put(Controls.reverseIntake, () -> primary.getYButton());
         controlsDigital.put(Controls.alignShooting, () -> primary.getRightTriggerAxis() > .7);
         controlsDigital.put(Controls.shooting, () -> primary.getYButton());

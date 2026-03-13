@@ -62,9 +62,6 @@ public class Superstructure {
 
     private boolean lockFirstTick;
 
-    private final Pose2d LEFT_START_POSE = new Pose2d();
-    private final Pose2d RIGHT_START_POSE = new Pose2d();
-
     private enum Paths {
         Left,
         Right,
@@ -253,7 +250,7 @@ public class Superstructure {
         double xPosition= Drivetrain.getInstance().getPose().getX();
         double yPosition = Drivetrain.getInstance().getPose().getY();
         Rotation2d rotation = new Rotation2d();
-        if (alliance ==  DriverStation.Alliance.Blue) {
+        if (getAlliance() ==  DriverStation.Alliance.Blue) {
             rotation = Rotation2d.fromRadians(0);
         }else{
             rotation = Rotation2d.fromRadians(Math.PI);
@@ -371,7 +368,10 @@ public class Superstructure {
                     Superstructure.getInstance().setRobotState(RobotStates.Auto);
                     IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
                 }),
-                new PathFollower(part1.getSplit(0).get()),
+                new ParallelDeadlineGroup(
+                        new WaitCommand(8),
+                        new PathFollower(part1.getSplit(0).get())
+                ),
                 new WaitCommand(2),
                 new PathFollower(part1.getSplit(1).get()),
                 new InstantCommand(() -> {
@@ -389,6 +389,22 @@ public class Superstructure {
                     Superstructure.getInstance().setRobotState(RobotStates.Auto);
                 })
             );
+//
+//            Pose2d handoff = new Pose2d();
+//            Trajectory<SwerveSample> autosPath = loadTrajectory("pobots");
+//            if (getAlliance() == DriverStation.Alliance.Red) {
+//                autosPath = autosPath.flipped();
+//            }
+//          handoff = autosPath.getInitialPose(false).get();
+//            setPose(handoff);
+//            autoCommand = new SequentialCommandGroup(
+//                    new PathFollower(autosPath),
+//                    new InstantCommand(() -> {
+//                        Superstructure.getInstance().setRobotState(RobotStates.Shooting);
+//                    }),
+//                    new WaitCommand(4)
+//            );
+
         }
     }
     public void disablePeriodic() {

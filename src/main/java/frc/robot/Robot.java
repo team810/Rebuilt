@@ -75,9 +75,12 @@ public class Robot extends LoggedRobot {
         }));
 
         intakeTrigger = new Trigger(IO.getButton(Controls.intake));
-        intakeTrigger.onTrue(new InstantCommand(
-            () -> IntakeSubsystem.getInstance().setState(IntakeStates.Deployed)
-        ));
+        intakeTrigger.whileTrue(
+                new StartEndCommand(
+                        () -> IntakeSubsystem.getInstance().setState(IntakeStates.Deployed),
+                        () -> IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff)
+                )
+        );
 
         reverseIntakeTrigger = new Trigger(IO.getButton(Controls.reverseIntake));
         reverseIntakeTrigger.whileTrue(new StartEndCommand(
@@ -86,7 +89,11 @@ public class Robot extends LoggedRobot {
                 FeederSubsystem.getInstance().setState(FeederStates.REVERSE);
                 MopSubsystem.getInstance().setState(MopStates.REVERSE);
                 },
-            () -> IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff)
+            () -> {
+                IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff);
+                FeederSubsystem.getInstance().setState(FeederStates.OFF);
+                MopSubsystem.getInstance().setState(MopStates.OFF);
+            }
         ));
 
         shooterAlignTrigger = new Trigger(IO.getButton(Controls.alignShooting));

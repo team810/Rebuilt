@@ -58,9 +58,9 @@ public class TrajectoryControl implements DrivetrainControlIO {
         Pose2d targetPose = sample.getPose();
         Pose2d currentPose = Drivetrain.getInstance().getPose();
         return
-            MathUtil.isNear(targetPose.getX() - currentPose.getX(), 0, .05) &&
-            MathUtil.isNear(targetPose.getY() - currentPose.getY(), 0, .05) &&
-            MathUtil.isNear(targetPose.getRotation().getRadians() - currentPose.getRotation().getRadians(), 0, .05);
+            MathUtil.isNear(targetPose.getX() - currentPose.getX(), 0, .1) &&
+            MathUtil.isNear(targetPose.getY() - currentPose.getY(), 0, .1) &&
+            MathUtil.isNear(targetPose.getRotation().getRadians() - currentPose.getRotation().getRadians(), 0, .1);
     }
 
     @Override

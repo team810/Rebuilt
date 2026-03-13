@@ -76,7 +76,7 @@ public class ShooterSubsystem extends ShooterTalonFX {
             Units.Meters
         );
         if (ferry) {
-            distanceToTarget = Distance.ofBaseUnits(distanceToTarget.in(Meters) - 2.5, Meters);
+            distanceToTarget = Distance.ofBaseUnits(distanceToTarget.in(Meters) - 1.5, Meters);
         }
         targetVelocity = 29.9 + (9.125 * distanceToTarget.in(Meters)) - (.255 * distanceToTarget.in(Meters) * distanceToTarget.in(Meters));
 
