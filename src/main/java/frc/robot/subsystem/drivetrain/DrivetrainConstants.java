@@ -111,7 +111,7 @@ public class DrivetrainConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.CurrentLimits.SupplyCurrentLimit = 40;
-        config.CurrentLimits.StatorCurrentLimit = 80;
+        config.CurrentLimits.StatorCurrentLimit = 60;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
 
@@ -140,7 +140,7 @@ public class DrivetrainConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         config.CurrentLimits.SupplyCurrentLimit = 20;
-        config.CurrentLimits.StatorCurrentLimit = 40;
+        config.CurrentLimits.StatorCurrentLimit = 30;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 

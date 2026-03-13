@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.Logger;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-public class ShooterSubsystem extends ShooterTalonFX {
+public class ShooterSubsystem {
     private static ShooterSubsystem INSTANCE = new ShooterSubsystem();
 
     private Distance distanceToTarget;
@@ -42,12 +42,24 @@ public class ShooterSubsystem extends ShooterTalonFX {
     }
 
 
-    @Override
     public void readPeriodic() {
         shooter.readPeriodic();
     }
 
-    @Override
+    public void setTarget(Pose2d currentPose, Pose2d targetPose, boolean ferry) {
+        double x = currentPose.getX() - targetPose.getX();
+        double y = currentPose.getY() - targetPose.getY();
+        distanceToTarget = Distance.ofBaseUnits(
+            Math.sqrt((x * x) + (y * y)) -.3,
+            Units.Meters
+        );
+        if (ferry) {
+            distanceToTarget = Distance.ofBaseUnits(distanceToTarget.in(Meters) - 1.5, Meters);
+        }
+        targetVelocity = 29.9 + (9.125 * distanceToTarget.in(Meters)) - (.255 * distanceToTarget.in(Meters) * distanceToTarget.in(Meters));
+
+    }
+
     public void writePeriodic() {
         Logger.recordOutput("Shooter/Distance", distanceToTarget);
         Logger.recordOutput("Shooter/TargetVelocity", targetVelocity);
@@ -66,20 +78,6 @@ public class ShooterSubsystem extends ShooterTalonFX {
         }
 
         shooter.writePeriodic();
-    }
-
-    public void setTarget(Pose2d currentPose, Pose2d targetPose, boolean ferry) {
-        double x = currentPose.getX() - targetPose.getX();
-        double y = currentPose.getY() - targetPose.getY();
-        distanceToTarget = Distance.ofBaseUnits(
-            Math.sqrt((x * x) + (y * y)) -.3,
-            Units.Meters
-        );
-        if (ferry) {
-            distanceToTarget = Distance.ofBaseUnits(distanceToTarget.in(Meters) - 1.5, Meters);
-        }
-        targetVelocity = 29.9 + (9.125 * distanceToTarget.in(Meters)) - (.255 * distanceToTarget.in(Meters) * distanceToTarget.in(Meters));
-
     }
 
     public void setState(ShooterState state) {

@@ -29,6 +29,7 @@ public class FeederSubsystem {
 
     public void readPeriodic(){
         Logger.recordOutput("Feeder/State",state);
+        io.readPeriodic();
         io.writePeriodic();
     }
     public void setState(FeederStates state){

@@ -51,7 +51,7 @@ public class ShooterTalonFX implements ShooterIO {
 
         config = new TalonFXConfiguration();
         config.CurrentLimits.SupplyCurrentLimit = 40;
-        config.CurrentLimits.StatorCurrentLimit = 100;
+        config.CurrentLimits.StatorCurrentLimit = 80;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 

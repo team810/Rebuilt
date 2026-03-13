@@ -34,7 +34,7 @@ public class FeederTalonFX implements FeederIO{
 
         TalonFXConfiguration feederConfig = new TalonFXConfiguration();
         feederConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        feederConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        feederConfig.CurrentLimits.SupplyCurrentLimit = 40;
         feederConfig.CurrentLimits.StatorCurrentLimit = 80;
         feederConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         feederConfig.Voltage.PeakForwardVoltage = 12;
@@ -74,11 +74,11 @@ public class FeederTalonFX implements FeederIO{
             feederSupplyCurrentSignal
         );
 
-        Logger.recordOutput("feeder/Motor/Voltage", feederVoltageSignal.getValue());
-        Logger.recordOutput("feeder/Motor/Current" , feederAppliedCurrentSignal.getValue());
-        Logger.recordOutput("feeder/Motor/SupplyCurrent" , feederSupplyCurrentSignal.getValue());
-        Logger.recordOutput("feeder/Motor/Temperature" , feederTemperatureSignal.getValue());
-        Logger.recordOutput("feeder/Motor/AppliedVoltage" , feederAppliedVoltage);
+        Logger.recordOutput("Feeder/Motor/Voltage", feederVoltageSignal.getValue());
+        Logger.recordOutput("Feeder/Motor/Current" , feederAppliedCurrentSignal.getValue());
+        Logger.recordOutput("Feeder/Motor/SupplyCurrent" , feederSupplyCurrentSignal.getValue());
+        Logger.recordOutput("Feeder/Motor/Temperature" , feederTemperatureSignal.getValue());
+        Logger.recordOutput("Feeder/Motor/AppliedVoltage" , feederAppliedVoltage);
 
     }
 
