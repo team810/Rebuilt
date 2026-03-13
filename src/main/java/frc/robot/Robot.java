@@ -103,7 +103,7 @@ public class Robot extends LoggedRobot {
                 Superstructure.getInstance().setRobotState(RobotStates.Default);
                 MopSubsystem.getInstance().setState(MopStates.OFF);
                 FeederSubsystem.getInstance().setState(FeederStates.OFF);
-
+                IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff);
             }
         ));
 
@@ -153,6 +153,8 @@ public class Robot extends LoggedRobot {
     @Override
     public void teleopInit() {
         Superstructure.getInstance().setRobotState(RobotStates.Default);
+        FeederSubsystem.getInstance().setState(FeederStates.OFF);
+        MopSubsystem.getInstance().setState(MopStates.OFF);
         LimelightHelpers.SetThrottle("limelight-ashoote", 0);
         LimelightHelpers.SetThrottle("limelight-bshoote", 0);
     }

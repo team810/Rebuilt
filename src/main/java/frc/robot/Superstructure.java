@@ -135,8 +135,8 @@ public class Superstructure {
         Logger.recordOutput("Distance", Math.sqrt(targetPose.relativeTo(Drivetrain.getInstance().getPose()).getX() * targetPose.relativeTo(Drivetrain.getInstance().getPose()).getX() + targetPose.relativeTo(Drivetrain.getInstance().getPose()).getY() * targetPose.relativeTo(Drivetrain.getInstance().getPose()).getY()));
 
         Rotation2d targetLock = new Rotation2d(
-            robotPose.getX() - shooterTarget.getX() - .19,
-            robotPose.getY() - shooterTarget.getY() - .09207
+            robotPose.getX() - shooterTarget.getX() - .098,
+            robotPose.getY() - shooterTarget.getY() - .212
         );
 
         // Drivetrain Input
@@ -189,14 +189,13 @@ public class Superstructure {
                     }else{
                         IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
                     }
-                    System.out.println("At Setpoint");
                 }else{
                     MopSubsystem.getInstance().setState(MopStates.OFF);
                     FeederSubsystem.getInstance().setState(FeederStates.OFF);
                     if (IntakeSubsystem.getInstance().getState() == IntakeStates.Deployed){
                         IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
                     }else{
-                        IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                        IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff);
                     }
                 }
             }
@@ -354,6 +353,7 @@ public class Superstructure {
             Trajectory<SwerveSample> part2 = loadTrajectory("middlePart2");
             if (getAlliance() == DriverStation.Alliance.Red) {
                 part1 = part1.flipped();
+                part2 = part2.flipped();
             }
             handoffPose = part1.getInitialPose(false).get();
             setPose(handoffPose);

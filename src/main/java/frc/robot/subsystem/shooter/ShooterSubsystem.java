@@ -72,7 +72,7 @@ public class ShooterSubsystem extends ShooterTalonFX {
         double x = currentPose.getX() - targetPose.getX();
         double y = currentPose.getY() - targetPose.getY();
         distanceToTarget = Distance.ofBaseUnits(
-            Math.sqrt(x * x + y * y),
+            Math.sqrt((x * x) + (y * y)) -.3,
             Units.Meters
         );
         if (ferry) {
