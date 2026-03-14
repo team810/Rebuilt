@@ -30,6 +30,7 @@ public class MopSubsystem {
 
     public void readPeriodic(){
         Logger.recordOutput("Mop/State",state);
+        io.readPeriodic();
         io.writePeriodic();
     }
     public void setState(MopStates state){

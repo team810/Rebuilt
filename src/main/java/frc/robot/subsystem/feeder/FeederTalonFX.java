@@ -34,7 +34,7 @@ public class FeederTalonFX implements FeederIO{
 
         TalonFXConfiguration feederConfig = new TalonFXConfiguration();
         feederConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        feederConfig.CurrentLimits.SupplyCurrentLimit = 40;
+        feederConfig.CurrentLimits.SupplyCurrentLimit = 60;
         feederConfig.CurrentLimits.StatorCurrentLimit = 80;
         feederConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         feederConfig.Voltage.PeakForwardVoltage = 12;

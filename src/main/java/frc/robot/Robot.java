@@ -143,6 +143,8 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         CommandScheduler.getInstance().schedule(Superstructure.getInstance().getAutonomousCommand());
+        LimelightHelpers.SetThrottle("limelight-ashoote", 0);
+        LimelightHelpers.SetThrottle("limelight-bshoote", 0);
     }
 
     @Override
@@ -165,8 +167,6 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
-        LimelightHelpers.SetThrottle("limelight-ashoote", 200);
-        LimelightHelpers.SetThrottle("limelight-bshoote", 200);
     }
 
     @Override

@@ -63,7 +63,10 @@ public class Drivetrain {
 
         control = new VelocityFOC(0,0,0);
         LimelightHelpers.setCameraPose_RobotSpace("limelight-bshoote", -.29845,.2452,.352,0,0,-90);
-        LimelightHelpers.setCameraPose_RobotSpace("limelight-ashoote", -0.309565,-0.263525,0.438943,0,0,90);
+        LimelightHelpers.setCameraPose_RobotSpace("limelight-ashoote", -0.309565,-0.263525,0.438943,0,15,90);
+
+        LimelightHelpers.SetIMUMode("limelight-ashoote",0);
+        LimelightHelpers.SetIMUMode("limelight-bshoote",0);
     }
 
     public void readPeriodic() {
@@ -76,6 +79,7 @@ public class Drivetrain {
 
         addVision("limelight-ashoote");
         addVision("limelight-bshoote");
+        ;
 
         odometry.update(
             new Rotation2d(yawSignal.getValue().in(Units.Radians)),
