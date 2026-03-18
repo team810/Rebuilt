@@ -133,7 +133,7 @@ public class TalonFxSwerveModule implements SwerveModuleIO {
         );
 
         StatusSignal.setUpdateFrequencyForAll(
-            250,
+            20,
             driveMotorTempSignal,
             driveAppliedVoltageSignal,
             driveSupplyCurrentSignal,

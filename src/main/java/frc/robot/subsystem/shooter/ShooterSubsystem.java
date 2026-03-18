@@ -23,7 +23,7 @@ public class ShooterSubsystem {
     private final ShooterIO shooter;
 
     private final SendableChooser<ShooterState> stateChooser;
-    private AngularVelocity testVelocity = AngularVelocity.ofBaseUnits(0,Units.RotationsPerSecond);
+    private AngularVelocity testVelocity = AngularVelocity.ofBaseUnits(0, RotationsPerSecond);
 
     private ShooterSubsystem() {
         stateChooser = new SendableChooser<>();

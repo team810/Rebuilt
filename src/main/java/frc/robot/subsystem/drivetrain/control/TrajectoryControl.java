@@ -20,12 +20,12 @@ public class TrajectoryControl implements DrivetrainControlIO {
         this.sample = sample;
 
         horizontalController = new PIDController(
-                6,
+                4,
                 0,
                 0
         );
         verticalController = new PIDController(
-                6,
+                4,
                 0,
                 0
         );

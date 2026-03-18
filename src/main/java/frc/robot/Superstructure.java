@@ -187,7 +187,7 @@ public class Superstructure {
                     if (IntakeSubsystem.getInstance().getState() == IntakeStates.Deployed){
                         IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
                     }else{
-                        IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
+                        IntakeSubsystem.getInstance().setState(IntakeStates.StoredFwd);
                     }
                 }else{
                     MopSubsystem.getInstance().setState(MopStates.OFF);
@@ -195,7 +195,7 @@ public class Superstructure {
                     if (IntakeSubsystem.getInstance().getState() == IntakeStates.Deployed){
                         IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
                     }else{
-                        IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff);
+                        IntakeSubsystem.getInstance().setState(IntakeStates.StoredFwd);
                     }
                 }
             }
@@ -270,6 +270,7 @@ public class Superstructure {
     }
 
     public void setAlliance(DriverStation.Alliance alliance) {
+
         this.alliance = alliance;
         if (alliance == DriverStation.Alliance.Blue) {
 
@@ -328,8 +329,9 @@ public class Superstructure {
             handoffPose = grabMiddle.getInitialPose(false).get();
             setPose(handoffPose);
             autoCommand = new SequentialCommandGroup(
+                new InstantCommand(() -> IntakeSubsystem.getInstance().setState(IntakeStates.Deployed)),
                 new InstantCommand(() -> setRobotState(RobotStates.Shooting)),
-                new WaitCommand(4),
+                new WaitCommand(2.5),
                 new InstantCommand(() -> {
                     setRobotState(RobotStates.Auto);
                     MopSubsystem.getInstance().setState(MopStates.OFF);
@@ -369,10 +371,9 @@ public class Superstructure {
                     IntakeSubsystem.getInstance().setState(IntakeStates.Deployed);
                 }),
                 new ParallelDeadlineGroup(
-                        new WaitCommand(8),
+                        new WaitCommand(7),
                         new PathFollower(part1.getSplit(0).get())
                 ),
-                new WaitCommand(2),
                 new PathFollower(part1.getSplit(1).get()),
                 new InstantCommand(() -> {
                     Superstructure.getInstance().setRobotState(RobotStates.Shooting);

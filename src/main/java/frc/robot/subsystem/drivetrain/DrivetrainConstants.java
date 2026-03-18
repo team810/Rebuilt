@@ -19,7 +19,7 @@ public class DrivetrainConstants {
 
     public final static String LIMELIGHT_SHOOTER = "limelight-shooter";
 
-    public final static double THETA_KP = 5;
+    public final static double THETA_KP = 4;
     public final static double THETA_KI = 0;
     public final static double THETA_KD = 0;
 
@@ -136,7 +136,7 @@ public class DrivetrainConstants {
     public static TalonFXConfiguration getSteerConfig(SwerveModule module) {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         config.CurrentLimits.SupplyCurrentLimit = 20;

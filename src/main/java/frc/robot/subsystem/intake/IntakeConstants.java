@@ -10,6 +10,6 @@ public class IntakeConstants {
     public static final int SOLENOID_FWD_CHANNEL = 1;
     public static final int SOLENOID_REV_CHANNEL = 0;
 
-    public static final Voltage INTAKE_VOLTAGE = Volts.of(7.5);
+    public static final Voltage INTAKE_VOLTAGE = Volts.of(10);
     public static final Voltage REVERSE_VOLTAGE = Volts.of(-5);
 }

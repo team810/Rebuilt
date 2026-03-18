@@ -55,12 +55,14 @@ public class Robot extends LoggedRobot {
         }
         Logger.start();
 
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         IO.Init();
         Superstructure.getInstance().setAlliance(DriverStation.Alliance.Blue);
         Superstructure.getInstance().setRobotState(RobotStates.Default);
 
         CommandScheduler.getInstance().enable();
-        CommandScheduler.getInstance().setPeriod(PERIOD);
+        CommandScheduler.getInstance().setPeriod(.01);
 
         resetGyroTrigger = new Trigger(IO.getButton(Controls.resetGyro));
         resetGyroTrigger.onTrue(new InstantCommand(() -> Superstructure.getInstance().resetGyro()));
@@ -103,7 +105,9 @@ public class Robot extends LoggedRobot {
                 Superstructure.getInstance().setRobotState(RobotStates.Default);
                 MopSubsystem.getInstance().setState(MopStates.OFF);
                 FeederSubsystem.getInstance().setState(FeederStates.OFF);
-                IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff);
+                if (IntakeSubsystem.getInstance().getState() != IntakeStates.Deployed){
+                    IntakeSubsystem.getInstance().setState(IntakeStates.StoredOff);
+                }
             }
         ));
 
