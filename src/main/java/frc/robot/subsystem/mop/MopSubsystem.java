@@ -2,6 +2,7 @@ package frc.robot.subsystem.mop;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.HashMap;
@@ -35,7 +36,19 @@ public class MopSubsystem {
     }
     public void setState(MopStates state){
         this.state = state;
-        io.setVoltage(mopVoltageMap.get(state));
+        if(!io.getIsStuck())
+            io.setVoltage(mopVoltageMap.get(state));
+        else{
+            double time = Logger.getTimestamp();
+            double output = Math.cos(time/(1000000 * Math.PI * .5));
+            if(output >= 1){
+                output = 4;
+            }else {
+                output = -4;
+            }
+            io.setVoltage(Voltage.ofBaseUnits(output, Units.Volts));
+
+        }
     }
     public static MopSubsystem getInstance(){
         return INSTANCE;

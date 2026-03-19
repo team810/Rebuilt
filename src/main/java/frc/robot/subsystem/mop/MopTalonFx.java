@@ -86,4 +86,9 @@ public class MopTalonFx implements MopIO {
         mopControl = new VoltageOut(voltage);
         mopMotor.setControl(mopControl);
     }
+
+    @Override
+    public boolean getIsStuck(){
+        return mopMotor.getStatorCurrent().getValueAsDouble() > 40;
+    }
 }
