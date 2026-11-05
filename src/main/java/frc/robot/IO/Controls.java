@@ -15,6 +15,7 @@ public enum Controls {
     intake,
     reverseIntake,
     toggleIntake,
+    pnuematicsTogle,
 
     retractClimb,
     extendClimb,

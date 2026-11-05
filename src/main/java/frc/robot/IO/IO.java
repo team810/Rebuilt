@@ -19,9 +19,11 @@ public class IO {
         controlsAnalog.put(Controls.omega, () -> primary.getRightX());
 
         controlsDigital.put(Controls.resetGyro, () -> primary.getAButton());
-        controlsDigital.put(Controls.toggleIntake, () -> secondary.getRightBumperButton());
+        controlsDigital.put(Controls.toggleIntake, () -> primary.getLeftBumperButton());
 
-        controlsDigital.put(Controls.intake, () -> secondary.getRightTriggerAxis()> .7);
+        controlsDigital.put(Controls.pnuematicsTogle, ()-> secondary.getBButton());
+
+        controlsDigital.put(Controls.intake, () -> primary.getLeftTriggerAxis()> .7);
         controlsDigital.put(Controls.reverseIntake, () -> primary.getYButton());
         controlsDigital.put(Controls.alignShooting, () -> primary.getRightTriggerAxis() > .7);
         controlsDigital.put(Controls.shooting, () -> primary.getYButton());

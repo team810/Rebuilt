@@ -7,7 +7,9 @@ package frc.robot;
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -46,7 +48,11 @@ public class Robot extends LoggedRobot {
 
     private final Trigger toggleIntakeTrigger;
 
+    private final Trigger pnuematicsToggleTrigger;
+
     private final Trigger trenchAutoAlignTrigger;
+
+    private final Compressor compressor;
 
     public Robot() {
         Logger.addDataReceiver(new NT4Publisher());
@@ -96,6 +102,14 @@ public class Robot extends LoggedRobot {
                 FeederSubsystem.getInstance().setState(FeederStates.OFF);
                 MopSubsystem.getInstance().setState(MopStates.OFF);
             }
+        ));
+
+        compressor = new Compressor(PneumaticsModuleType.CTREPCM);
+
+        pnuematicsToggleTrigger = new Trigger(IO.getButton(Controls.pnuematicsTogle));
+        pnuematicsToggleTrigger.whileTrue(new StartEndCommand(
+            ()-> compressor.enableDigital(),
+            ()-> compressor.disable()
         ));
 
         shooterAlignTrigger = new Trigger(IO.getButton(Controls.alignShooting));
